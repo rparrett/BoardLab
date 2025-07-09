@@ -1767,6 +1767,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - react-native-vector-icons-fontawesome (12.0.1)
   - react-native-vector-icons-ionicons (12.0.1)
   - react-native-vector-icons-material-icons (12.0.1)
   - React-NativeModulesApple (0.80.1):
@@ -2411,6 +2412,7 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - react-native-quick-sqlite (from `../node_modules/react-native-quick-sqlite`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - "react-native-vector-icons-fontawesome (from `../node_modules/@react-native-vector-icons/fontawesome`)"
   - "react-native-vector-icons-ionicons (from `../node_modules/@react-native-vector-icons/ionicons`)"
   - "react-native-vector-icons-material-icons (from `../node_modules/@react-native-vector-icons/material-icons`)"
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -2541,6 +2543,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-quick-sqlite"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-vector-icons-fontawesome:
+    :path: "../node_modules/@react-native-vector-icons/fontawesome"
   react-native-vector-icons-ionicons:
     :path: "../node_modules/@react-native-vector-icons/ionicons"
   react-native-vector-icons-material-icons:
@@ -2661,6 +2665,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: d9499269ad1f484ae71319bac1d9231447f2094e
   react-native-quick-sqlite: 263402c4c603ad7004ae2ba6b61303df5c9ac67b
   react-native-safe-area-context: d3738f0c3b1fcefaed874a45891b0d44306c47c1
+  react-native-vector-icons-fontawesome: 3d17a696d3f897139f0094437c2acdb2eee08939
   react-native-vector-icons-ionicons: 82538a5f94fd186b3b7abd49192ea96e28876887
   react-native-vector-icons-material-icons: e1c2768c9bba5442735b791ec7a152b642aaf3ad
   React-NativeModulesApple: 983f3483ef0a3446b56d490f09d579fba2442e17

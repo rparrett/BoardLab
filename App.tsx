@@ -25,9 +25,11 @@ const Navigation = () => {
 const theme = createTheme({
   darkColors: {
     secondarySurface: 'rgb(18, 18, 18)',
+    star: '#fdc700',
   },
   lightColors: {
     secondarySurface: 'rgb(255, 255, 255)',
+    star: '#fdc700',
   },
 });
 
