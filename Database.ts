@@ -22,9 +22,29 @@ export async function getClimbsDb(angle: number) {
 
   console.log(angle);
 
-  let { rows } = db.execute('SELECT * FROM climbs WHERE angle = ? LIMIT 10', [
-    angle,
-  ]);
+  let { rows } = db.execute(
+    `
+    SELECT
+      climbs.*,
+      climb_cache_fields.ascensionist_count AS total_ascensionist_count,
+      climb_cache_fields.display_difficulty AS total_display_difficulty,
+      climb_cache_fields.quality_average AS total_quality_average,
+      climb_stats.display_difficulty,
+      climb_stats.benchmark_difficulty,
+      climb_stats.ascensionist_count,
+      climb_stats.difficulty_average,
+      climb_stats.quality_average,
+      climb_stats.fa_username,
+      climb_stats.fa_at
+    FROM climbs
+    LEFT JOIN climb_cache_fields ON climbs.uuid = climb_cache_fields.climb_uuid
+    LEFT JOIN climb_stats ON climbs.uuid = climb_stats.climb_uuid AND climb_stats.angle = ?
+    WHERE climbs.layout_id = 1
+    ORDER BY climb_stats.ascensionist_count DESC
+    LIMIT 100
+    `,
+    [angle],
+  );
   if (rows) {
     for (let i = 0; i < rows.length; i++) {
       climbs.push(rows.item(i));
@@ -47,45 +67,16 @@ export type DbClimb = {
   is_draft: boolean;
   is_listed: boolean;
   angle: number;
+  //
+  total_ascensionist_count: number | null;
+  total_display_difficulty: number | null;
+  total_quality_average: number | null;
+  //
+  display_difficulty: number | null;
+  benchmark_difficulty: number | null;
+  ascensionist_count: number | null;
+  difficulty_average: number | null;
+  quality_average: number | null;
+  fa_username: string | null;
+  fa_at: string | null;
 };
-
-// export const getClimbs = (): DbClimb[] => {
-//   let { rows } = db.execute(
-//     `SELECT
-//         uuid, name, description, frames_count, frames_pace, frames, setter_id,
-//         setter_username, layout_id, is_draft, is_listed, angle
-//     FROM climbs`,
-//   );
-
-//   rows.forEach(row => {
-//     console.log(row);
-//   });
-
-//   return [];
-// };
-
-// export const getDBConnection = async () => {
-//   return openDatabase({
-//     name: 'test.db',
-//     location: 'default',
-//     // readOnly: true,
-//     // createFromLocation: 'assets/db.sqlite3',
-//   });
-// };
-
-// export const getClimbs = async (db: SQLiteDatabase): Promise<DbClimb[]> => {
-//   const climbs: DbClimb[] = [];
-//   const results = await db.executeSql(
-//     `SELECT
-//         uuid, name, description, frames_count, frames_pace, frames, setter_id,
-//         setter_username, layout_id, is_draft, is_listed, angle
-//     FROM climbs`,
-//   );
-//   results.forEach(result => {
-//     for (let index = 0; index < result.rows.length; index++) {
-//       console.log(result.rows.item(index));
-//       climbs.push(result.rows.item(index));
-//     }
-//   });
-//   return climbs;
-// };

@@ -15,6 +15,7 @@ import { getClimbsDb, DbClimb } from '../Database';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { ListItem, Text } from '@rneui/themed';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
+import { match, P } from 'ts-pattern';
 
 type Props = StaticScreenProps<{}>;
 
@@ -61,6 +62,17 @@ export default function ClimbListScreen({}: Props) {
   }, [navigation, selectedAngle, colors]);
 
   const renderItem = ({ item }: { item: DbClimb }) => {
+    let subtitle = match(item)
+      .with({ fa_username: null }, () => `Set: ${item.setter_username}`)
+      .with(
+        { fa_username: P.string, setter_username: P.string },
+        ({ fa_username, setter_username }) =>
+          fa_username === setter_username
+            ? `Set & FA: ${item.setter_username}`
+            : `Set: ${item.setter_username} FA: ${item.setter_username}`,
+      )
+      .otherwise(() => null);
+
     return (
       <ListItem
         bottomDivider
@@ -69,7 +81,10 @@ export default function ClimbListScreen({}: Props) {
       >
         <ListItem.Content>
           <ListItem.Title>{item.name}</ListItem.Title>
-          <ListItem.Subtitle>by {item.setter_username}</ListItem.Subtitle>
+          {subtitle && <ListItem.Subtitle>{subtitle}</ListItem.Subtitle>}
+          <ListItem.Subtitle>
+            {item.ascensionist_count} ascensionists
+          </ListItem.Subtitle>
         </ListItem.Content>
         <ListItem.Chevron />
       </ListItem>
@@ -91,7 +106,11 @@ export default function ClimbListScreen({}: Props) {
 
   return (
     <View>
-      <FlatList data={climbs} renderItem={renderItem} />
+      <FlatList
+        data={climbs}
+        renderItem={renderItem}
+        keyExtractor={item => item.uuid}
+      />
       <AngleSelectBottomSheet
         isVisible={isVisible}
         selectedAngle={selectedAngle}
