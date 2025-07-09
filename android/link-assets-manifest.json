@@ -1,0 +1,13 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/db.sqlite3",
+      "sha1": "0460e24b6ee270d7bc7405737a7818f65cae860e"
+    },
+    {
+      "path": "assets/wrangler-promo.png",
+      "sha1": "eaf41e3267551c8b9543208147de95157b35e1d9"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { StaticScreenProps } from '@react-navigation/native';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text } from '@rneui/themed';
+import { StyleSheet, View } from 'react-native';
 
 type Props = StaticScreenProps<{}>;
 

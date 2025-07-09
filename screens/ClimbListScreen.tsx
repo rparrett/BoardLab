@@ -1,52 +1,103 @@
-import { StaticScreenProps, useNavigation } from '@react-navigation/native';
+import {
+  StaticScreenProps,
+  useNavigation,
+  useTheme,
+} from '@react-navigation/native';
 import {
   FlatList,
   StyleSheet,
-  Text,
+  TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
-
-type ClimbItem = {
-  uuid: string;
-};
+import { getClimbsDb, DbClimb } from '../Database';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { ListItem, Text } from '@rneui/themed';
+import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
 
 type Props = StaticScreenProps<{}>;
 
 export default function ClimbListScreen({}: Props) {
   const navigation = useNavigation<ClimbsStackNavigationProp>();
 
-  const data: ClimbItem[] = [
-    {
-      uuid: 'testuuid',
-    },
-    {
-      uuid: 'testuuid2',
-    },
-  ];
+  const [climbs, setClimbs] = useState<DbClimb[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedAngle, setSelectedAngle] = useState(40);
+  const [isVisible, setIsVisible] = useState(false);
 
-  const renderItem = ({ item }: { item: ClimbItem }) => {
+  const { colors } = useTheme();
+
+  useEffect(() => {
+    loadClimbs(selectedAngle);
+  }, [selectedAngle]);
+
+  const loadClimbs = async (angle: number) => {
+    try {
+      setLoading(true);
+      const climbsData = await getClimbsDb(angle);
+      setClimbs(climbsData);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error loading climbs:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => setIsVisible(true)}>
+          <Text
+            style={{ color: colors.primary, fontSize: 16, marginRight: 15 }}
+          >
+            {selectedAngle}°
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, selectedAngle, colors]);
+
+  const renderItem = ({ item }: { item: DbClimb }) => {
     return (
-      <TouchableOpacity
+      <ListItem
+        bottomDivider
+        Component={TouchableHighlight}
         onPress={() => navigation.navigate('Climb', { uuid: item.uuid })}
       >
-        <Text>{item.uuid}</Text>
-      </TouchableOpacity>
+        <ListItem.Content>
+          <ListItem.Title>{item.name}</ListItem.Title>
+          <ListItem.Subtitle>by {item.setter_username}</ListItem.Subtitle>
+        </ListItem.Content>
+        <ListItem.Chevron />
+      </ListItem>
     );
   };
 
+  const handleSelect = (option: { label: string; value: number }) => {
+    setSelectedAngle(option.value);
+    setIsVisible(false);
+  };
+
+  if (loading) {
+    return <Text>Loading climbs...</Text>;
+  }
+
+  if (error) {
+    return <Text>Error: {error}</Text>;
+  }
+
   return (
-    <View style={styles.container}>
-      <FlatList data={data} renderItem={renderItem} />
+    <View>
+      <FlatList data={climbs} renderItem={renderItem} />
+      <AngleSelectBottomSheet
+        isVisible={isVisible}
+        selectedAngle={selectedAngle}
+        onSelect={handleSelect}
+        onBackdropPress={() => setIsVisible(false)}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

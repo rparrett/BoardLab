@@ -1,5 +1,6 @@
-import { StaticScreenProps } from '@react-navigation/native';
-import { StyleSheet, Text, View } from 'react-native';
+import { StaticScreenProps, useTheme } from '@react-navigation/native';
+import { Text } from '@rneui/themed';
+import { StyleSheet, View } from 'react-native';
 
 type Props = StaticScreenProps<{
   uuid: string;
@@ -8,6 +9,7 @@ type Props = StaticScreenProps<{
 export default function ClimbScreen({ route }: Props) {
   let { params } = route;
   let { uuid } = params;
+
   return (
     <View style={styles.container}>
       <Text>Climb</Text>
