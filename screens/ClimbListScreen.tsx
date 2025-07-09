@@ -3,19 +3,13 @@ import {
   useNavigation,
   useTheme,
 } from '@react-navigation/native';
-import {
-  FlatList,
-  StyleSheet,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { FlatList, TouchableOpacity, View } from 'react-native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
 import { getClimbsDb, DbClimb } from '../Database';
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { ListItem, Text } from '@rneui/themed';
+import { Text } from '@rneui/themed';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
-import { match, P } from 'ts-pattern';
+import ClimbListItem from '../components/ClimbListItem';
 
 type Props = StaticScreenProps<{}>;
 
@@ -62,32 +56,11 @@ export default function ClimbListScreen({}: Props) {
   }, [navigation, selectedAngle, colors]);
 
   const renderItem = ({ item }: { item: DbClimb }) => {
-    let subtitle = match(item)
-      .with({ fa_username: null }, () => `Set: ${item.setter_username}`)
-      .with(
-        { fa_username: P.string, setter_username: P.string },
-        ({ fa_username, setter_username }) =>
-          fa_username === setter_username
-            ? `Set & FA: ${item.setter_username}`
-            : `Set: ${item.setter_username} FA: ${item.setter_username}`,
-      )
-      .otherwise(() => null);
-
     return (
-      <ListItem
-        bottomDivider
-        Component={TouchableHighlight}
+      <ClimbListItem
+        item={item}
         onPress={() => navigation.navigate('Climb', { uuid: item.uuid })}
-      >
-        <ListItem.Content>
-          <ListItem.Title>{item.name}</ListItem.Title>
-          {subtitle && <ListItem.Subtitle>{subtitle}</ListItem.Subtitle>}
-          <ListItem.Subtitle>
-            {item.ascensionist_count} ascensionists
-          </ListItem.Subtitle>
-        </ListItem.Content>
-        <ListItem.Chevron />
-      </ListItem>
+      />
     );
   };
 
