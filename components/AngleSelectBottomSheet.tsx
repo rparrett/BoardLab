@@ -3,11 +3,9 @@ import { View } from 'react-native';
 import {
   BottomSheet,
   ListItem,
-  Text,
-  Divider,
   makeStyles,
 } from '@rneui/themed';
-import {} from '@react-navigation/native';
+import BottomSheetHeader from './BottomSheetHeader';
 
 type AngleOption = {
   label: string;
@@ -45,10 +43,7 @@ export default function AngleSelectBottomSheet({
       onBackdropPress={onBackdropPress}
       scrollViewProps={{ style: styles.container }}
     >
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Select Angle</Text>
-        <Divider />
-      </View>
+      <BottomSheetHeader title="Select Angle" onClose={onBackdropPress} />
 
       {angleOptions.map(option => (
         <ListItem
@@ -77,14 +72,6 @@ const useStyles = makeStyles((theme, _props: Props) => ({
     backgroundColor: theme.colors.secondarySurface,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-  },
-  headerContainer: {
-    alignItems: 'center',
-  },
-  headerText: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    paddingVertical: 10,
   },
   listItemContainer: {
     backgroundColor: theme.colors.secondarySurface,
