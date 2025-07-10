@@ -1,8 +1,9 @@
 import { StaticScreenProps } from '@react-navigation/native';
 import { Text, Icon } from '@rneui/themed';
-import { StyleSheet, View, Dimensions, Image } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
+import { useState } from 'react';
 import Loading from '../components/Loading';
 import Error from '../components/Error';
 import StarRating from '../components/StarRating';
@@ -16,12 +17,15 @@ export default function ClimbScreen({ route }: Props) {
   let { params } = route;
   let { uuid } = params;
   const { getClimb, getPlacementData, getRoles, ready } = useDatabase();
-  const { width: screenWidth } = Dimensions.get('window');
+  const [containerDimensions, setContainerDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
 
   const imageWidth = 1080.0;
   const imageHeight = 1170.0;
 
-  const scale = screenWidth / imageWidth;
+  const scale = containerDimensions.width / imageWidth;
   const scaledImageHeight = imageHeight * scale;
 
   const asyncClimb = useAsync(() => {
@@ -87,60 +91,76 @@ export default function ClimbScreen({ route }: Props) {
         </View>
       </View>
 
-      <ImageZoom
-        cropWidth={screenWidth}
-        cropHeight={scaledImageHeight}
-        imageWidth={screenWidth}
-        imageHeight={scaledImageHeight}
-        minScale={1}
-        maxScale={4}
+      <View
+        style={styles.imageZoomContainer}
+        onLayout={event => {
+          const { width, height } = event.nativeEvent.layout;
+          setContainerDimensions({ width, height });
+        }}
       >
-        <View style={styles.imageContainer}>
-          <Image
-            source={require('../assets/45-1.png')}
-            style={styles.layeredImage}
-            resizeMode="contain"
-          />
-          <Image
-            source={require('../assets/46-1.png')}
-            style={styles.layeredImage}
-            resizeMode="contain"
-          />
-          {placementData &&
-            roles &&
-            Array.from(placements.entries()).map(([placementId, roleId]) => {
-              const placement = placementData.get(placementId);
-              if (!placement) {
-                console.warn('no placement', placementId);
-                return null;
-              }
+        {containerDimensions.width > 0 && (
+          <ImageZoom
+            cropWidth={containerDimensions.width}
+            cropHeight={containerDimensions.height}
+            imageWidth={containerDimensions.width}
+            imageHeight={scaledImageHeight}
+            minScale={1}
+            maxScale={4}
+          >
+            <View style={styles.imageContainer}>
+              <Image
+                source={require('../assets/45-1.png')}
+                style={styles.layeredImage}
+                resizeMode="contain"
+              />
+              <Image
+                source={require('../assets/46-1.png')}
+                style={styles.layeredImage}
+                resizeMode="contain"
+              />
+              {placementData &&
+                roles &&
+                Array.from(placements.entries()).map(
+                  ([placementId, roleId]) => {
+                    const placement = placementData.get(placementId);
+                    if (!placement) {
+                      console.warn('no placement', placementId);
+                      return null;
+                    }
 
-              const role = roles.get(roleId);
-              if (!role) {
-                console.warn('no role', roleId);
-                return null;
-              }
+                    const role = roles.get(roleId);
+                    if (!role) {
+                      console.warn('no role', roleId);
+                      return null;
+                    }
 
-              let iconSize = 22;
-              let scaledX = placement.x * screenWidth - iconSize / 2 + 2;
-              let scaledY = placement.y * scaledImageHeight - iconSize / 2;
+                    let iconSize = 22;
+                    let scaledX =
+                      placement.x * containerDimensions.width -
+                      iconSize / 2 +
+                      2;
+                    let scaledY =
+                      placement.y * scaledImageHeight - iconSize / 2;
 
-              return (
-                <Icon
-                  key={`position-${placementId}`}
-                  name="circle-o"
-                  type="font-awesome"
-                  size={iconSize}
-                  color={`#${role.screenColor}`}
-                  containerStyle={[
-                    styles.positionIndicator,
-                    { left: scaledX, top: scaledY },
-                  ]}
-                />
-              );
-            })}
-        </View>
-      </ImageZoom>
+                    return (
+                      <Icon
+                        key={`position-${placementId}`}
+                        name="circle-o"
+                        type="font-awesome"
+                        size={iconSize}
+                        color={`#${role.screenColor}`}
+                        containerStyle={[
+                          styles.positionIndicator,
+                          { left: scaledX, top: scaledY },
+                        ]}
+                      />
+                    );
+                  },
+                )}
+            </View>
+          </ImageZoom>
+        )}
+      </View>
     </View>
   );
 }
@@ -167,6 +187,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   grade: {},
+  imageZoomContainer: {
+    flex: 1,
+  },
   imageContainer: {
     width: '100%',
     height: '100%',
