@@ -67,7 +67,12 @@ export default function ClimbListItem({ item, onPress }: Props) {
         </View>
         <View style={styles.rightColumn}>
           {item.grade_name && (
-            <Text style={[styles.grade]}>
+            <Text
+              style={[
+                styles.grade,
+                item.benchmark_difficulty !== null ? styles.benchmarkGrade : {},
+              ]}
+            >
               {item.grade_name}
             </Text>
           )}
@@ -109,5 +114,8 @@ const useStyles = makeStyles((theme, _props: Props) => ({
   },
   grade: {
     fontSize: Platform.select({ ios: 15, default: 14 }),
+  },
+  benchmarkGrade: {
+    color: theme.colors.secondary,
   },
 }));
