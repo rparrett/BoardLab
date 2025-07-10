@@ -5,41 +5,28 @@ import {
 } from '@react-navigation/native';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
-import { getClimbsDb, DbClimb } from '../Database';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { DbClimb, useDatabase } from '../contexts/DatabaseProvider';
+import { useLayoutEffect, useState } from 'react';
 import { Text } from '@rneui/themed';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
 import ClimbListItem from '../components/ClimbListItem';
+import Loading from '../components/Loading';
+import Error from '../components/Error';
+import { useAsync } from 'react-async-hook';
 
 type Props = StaticScreenProps<{}>;
 
 export default function ClimbListScreen({}: Props) {
   const navigation = useNavigation<ClimbsStackNavigationProp>();
-
-  const [climbs, setClimbs] = useState<DbClimb[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { getFilteredClimbs, ready } = useDatabase();
   const [selectedAngle, setSelectedAngle] = useState(40);
   const [isVisible, setIsVisible] = useState(false);
 
   const { colors } = useTheme();
 
-  useEffect(() => {
-    loadClimbs(selectedAngle);
-  }, [selectedAngle]);
-
-  const loadClimbs = async (angle: number) => {
-    try {
-      setLoading(true);
-      const climbsData = await getClimbsDb(angle);
-      setClimbs(climbsData);
-    } catch (err) {
-      setError(err.message);
-      console.error('Error loading climbs:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const asyncClimbs = useAsync(() => {
+    return getFilteredClimbs(selectedAngle);
+  }, [selectedAngle, ready]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -69,18 +56,18 @@ export default function ClimbListScreen({}: Props) {
     setIsVisible(false);
   };
 
-  if (loading) {
-    return <Text>Loading climbs...</Text>;
+  if (asyncClimbs.loading) {
+    return <Loading text="Loading climbs..." />;
   }
 
-  if (error) {
-    return <Text>Error: {error}</Text>;
+  if (asyncClimbs.error) {
+    return <Error error={asyncClimbs.error} />;
   }
 
   return (
     <View>
       <FlatList
-        data={climbs}
+        data={asyncClimbs.result || []}
         renderItem={renderItem}
         keyExtractor={item => item.uuid}
       />

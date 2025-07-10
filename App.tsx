@@ -8,6 +8,7 @@ import React from 'react';
 import BottomTabs, { BottomTabsParamList } from './navigators/BottomTabs';
 import { useColorScheme } from 'react-native';
 import { createTheme, ThemeProvider, useTheme } from '@rneui/themed';
+import { DatabaseProvider } from './contexts/DatabaseProvider';
 
 const Navigation = () => {
   let { theme } = useTheme();
@@ -39,7 +40,9 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Navigation />
+      <DatabaseProvider>
+        <Navigation />
+      </DatabaseProvider>
     </ThemeProvider>
   );
 }
