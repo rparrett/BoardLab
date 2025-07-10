@@ -47,9 +47,9 @@ export default function AngleSelectBottomSheet({
         <Divider />
       </View>
 
-      {angleOptions.map((option, index) => (
+      {angleOptions.map(option => (
         <ListItem
-          key={index}
+          key={option.value}
           onPress={() => onSelect(option)}
           bottomDivider
           containerStyle={styles.listItemContainer}
