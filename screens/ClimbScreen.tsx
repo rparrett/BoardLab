@@ -40,16 +40,10 @@ export default function ClimbScreen({ route }: Props) {
     return <Loading text="Loading climb..." />;
   }
 
-  if (asyncClimb.error) {
-    return <Error error={asyncClimb.error} />;
-  }
-
-  if (asyncPlacementData.error) {
-    return <Error error={asyncPlacementData.error} />;
-  }
-
-  if (asyncRoles.error) {
-    return <Error error={asyncRoles.error} />;
+  let asyncError =
+    asyncClimb.error || asyncPlacementData.error || asyncRoles.error;
+  if (asyncError) {
+    return <Error error={asyncError} />;
   }
 
   if (!asyncClimb.result) {
