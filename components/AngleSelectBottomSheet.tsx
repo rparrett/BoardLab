@@ -42,7 +42,11 @@ export default function AngleSelectBottomSheet({
       onBackdropPress={onBackdropPress}
       scrollViewProps={{ style: styles.container }}
     >
-      <BottomSheetHeader title="Select Angle" onClose={onBackdropPress} />
+      <BottomSheetHeader
+        key="title"
+        title="Select Angle"
+        onClose={onBackdropPress}
+      />
 
       {angleOptions.map(option => (
         <ListItem
@@ -74,6 +78,8 @@ const useStyles = makeStyles((theme, _props: Props) => ({
   },
   listItemContainer: {
     backgroundColor: theme.colors.secondarySurface,
+    margin: 0,
+    paddingVertical: 8,
   },
   listItemCheckboxContainer: {
     backgroundColor: 'none',
