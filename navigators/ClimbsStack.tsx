@@ -15,7 +15,12 @@ export type ClimbsStackNavigationProp = StackNavigationProp<
 
 const ClimbsStack = createStackNavigator({
   screens: {
-    ClimbList: ClimbListScreen,
+    ClimbList: {
+      screen: ClimbListScreen,
+      options: {
+        title: 'Climbs',
+      },
+    },
     Climb: ClimbScreen,
   },
 });

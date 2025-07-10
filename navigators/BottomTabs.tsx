@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SettingsScreen from '../screens/SettingsScreen';
 import ClimbsStack from './ClimbsStack';
 import { StaticParamList } from '@react-navigation/native';
+import { Icon } from '@rneui/themed';
 
 export type BottomTabsParamList = StaticParamList<typeof BottomTabs>;
 
@@ -11,9 +12,19 @@ const BottomTabs = createBottomTabNavigator({
       screen: ClimbsStack,
       options: {
         headerShown: false,
+        tabBarIcon: ({ color, size }) => (
+          <Icon name="sports-handball" type="material" color={color} size={size} />
+        ),
       },
     },
-    Settings: SettingsScreen,
+    Settings: {
+      screen: SettingsScreen,
+      options: {
+        tabBarIcon: ({ color, size }) => (
+          <Icon name="settings" type="material" color={color} size={size} />
+        ),
+      },
+    },
   },
 });
 
