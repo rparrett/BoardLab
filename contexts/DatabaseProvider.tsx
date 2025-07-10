@@ -51,7 +51,7 @@ type DatabaseContextType = {
   db: QuickSQLiteConnection | null;
   ready: boolean;
   error: string | null;
-  getFilteredClimbs: (angle: number) => Promise<DbClimb[]>;
+  getFilteredClimbs: (angle: number, search: string) => Promise<DbClimb[]>;
   getClimb: (uuid: string) => Promise<DbClimb | null>;
   getPlacementData: () => Promise<Map<number, PlacementData>>;
   getRoles: (productId: number) => Promise<Map<number, Role>>;
@@ -94,7 +94,10 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const getFilteredClimbs = async (angle: number): Promise<DbClimb[]> => {
+  const getFilteredClimbs = async (
+    angle: number,
+    search: string,
+  ): Promise<DbClimb[]> => {
     if (!db) {
       console.warn('Attempting to query with no database connection.');
       return [];
@@ -121,11 +124,11 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       LEFT JOIN climb_cache_fields ON climbs.uuid = climb_cache_fields.climb_uuid
       LEFT JOIN climb_stats ON climbs.uuid = climb_stats.climb_uuid AND climb_stats.angle = ?
       LEFT JOIN difficulty_grades ON ROUND(climb_stats.display_difficulty) = difficulty_grades.difficulty
-      WHERE climbs.layout_id = 1
+      WHERE climbs.layout_id = 1 AND climbs.name LIKE ?
       ORDER BY climb_stats.ascensionist_count DESC
       LIMIT 100
       `,
-      [angle],
+      [angle, `%${search}%`],
     );
 
     if (rows) {

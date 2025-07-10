@@ -17,7 +17,6 @@ const Navigation = () => {
   let navigationTheme = scheme === 'dark' ? DarkTheme : DefaultTheme;
   navigationTheme.colors.background = theme.colors.background;
   navigationTheme.colors.primary = theme.colors.primary;
-  console.log('navThemeCard', navigationTheme.colors.card);
 
   let Nav = createStaticNavigation(BottomTabs);
   return <Nav theme={navigationTheme} />;

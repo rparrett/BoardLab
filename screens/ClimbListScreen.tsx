@@ -1,13 +1,9 @@
-import {
-  StaticScreenProps,
-  useNavigation,
-  useTheme,
-} from '@react-navigation/native';
+import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
 import { DbClimb, useDatabase } from '../contexts/DatabaseProvider';
 import { useLayoutEffect, useState } from 'react';
-import { Text } from '@rneui/themed';
+import { Text, SearchBar, Icon, useTheme, makeStyles } from '@rneui/themed';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
 import ClimbListItem from '../components/ClimbListItem';
 import Loading from '../components/Loading';
@@ -21,26 +17,26 @@ export default function ClimbListScreen({}: Props) {
   const { getFilteredClimbs, ready } = useDatabase();
   const [selectedAngle, setSelectedAngle] = useState(40);
   const [isVisible, setIsVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
-  const { colors } = useTheme();
+  const { theme } = useTheme();
+  const styles = useStyles();
 
   const asyncClimbs = useAsync(() => {
-    return getFilteredClimbs(selectedAngle);
-  }, [selectedAngle, ready]);
+    return getFilteredClimbs(selectedAngle, searchText);
+  }, [selectedAngle, ready, searchText]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={() => setIsVisible(true)}>
-          <Text
-            style={{ color: colors.primary, fontSize: 16, marginRight: 15 }}
-          >
-            {selectedAngle}°
-          </Text>
+          <Text style={styles.angleSelectButtonText}>{selectedAngle}°</Text>
         </TouchableOpacity>
       ),
     });
-  }, [navigation, selectedAngle, colors]);
+  }, [navigation, selectedAngle, styles]);
+
+  console.log(asyncClimbs.result);
 
   const renderItem = ({ item }: { item: DbClimb }) => {
     return (
@@ -56,21 +52,41 @@ export default function ClimbListScreen({}: Props) {
     setIsVisible(false);
   };
 
-  if (asyncClimbs.loading) {
-    return <Loading text="Loading climbs..." />;
-  }
-
-  if (asyncClimbs.error) {
-    return <Error error={asyncClimbs.error} />;
-  }
-
   return (
-    <View>
-      <FlatList
-        data={asyncClimbs.result || []}
-        renderItem={renderItem}
-        keyExtractor={item => item.uuid}
+    <View style={{ flex: 1 }}>
+      <SearchBar
+        key="search-bar"
+        placeholder="Search"
+        value={searchText}
+        onChangeText={setSearchText}
+        platform="ios"
+        showCancel={false}
+        containerStyle={styles.searchBarContainer}
+        inputContainerStyle={styles.searchBarInputContainer}
+        inputStyle={styles.searchBarInput}
+        placeholderTextColor={theme.colors.grey2}
+        clearIcon=<Icon
+          size={20}
+          type="ionicons"
+          name="close"
+          iconStyle={styles.searchBarIcon}
+        />
+        searchIcon=<Icon
+          size={20}
+          type="ionicons"
+          name="search"
+          iconStyle={styles.searchBarIcon}
+        />
       />
+      {asyncClimbs.loading && <Loading text="Loading climbs..." />}
+      {asyncClimbs.error && <Error error={asyncClimbs.error} />}
+      {!asyncClimbs.loading && !asyncClimbs.error && (
+        <FlatList
+          data={asyncClimbs.result || []}
+          renderItem={renderItem}
+          keyExtractor={item => item.uuid}
+        />
+      )}
       <AngleSelectBottomSheet
         isVisible={isVisible}
         selectedAngle={selectedAngle}
@@ -80,3 +96,25 @@ export default function ClimbListScreen({}: Props) {
     </View>
   );
 }
+
+const useStyles = makeStyles((theme, _props: Props) => ({
+  searchBarContainer: {
+    height: 52,
+  },
+  searchBarInputContainer: {
+    height: 20,
+  },
+  searchBarInput: {
+    fontSize: 15,
+    minHeight: 20,
+    color: theme.colors.black,
+  },
+  searchBarIcon: {
+    color: theme.colors.grey2,
+  },
+  angleSelectButtonText: {
+    color: theme.colors.primary,
+    fontSize: 16,
+    marginRight: 15,
+  },
+}));
