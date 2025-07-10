@@ -121,16 +121,16 @@ export default function ClimbScreen({ route }: Props) {
                 return null;
               }
 
-              // TODO it's not at all clear why these adjustments are required
-              let scaledX = placement.x * screenWidth - 8;
-              let scaledY = placement.y * scaledImageHeight - 10;
+              let iconSize = 22;
+              let scaledX = placement.x * screenWidth - iconSize / 2 + 2;
+              let scaledY = placement.y * scaledImageHeight - iconSize / 2;
 
               return (
                 <Icon
                   key={`position-${placementId}`}
                   name="circle-o"
                   type="font-awesome"
-                  size={20}
+                  size={iconSize}
                   color={`#${role.screenColor}`}
                   containerStyle={[
                     styles.positionIndicator,
