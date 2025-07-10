@@ -54,30 +54,40 @@ export default function ClimbListScreen({}: Props) {
 
   return (
     <View style={{ flex: 1 }}>
-      <SearchBar
-        key="search-bar"
-        placeholder="Search"
-        value={searchText}
-        onChangeText={setSearchText}
-        platform="ios"
-        showCancel={false}
-        containerStyle={styles.searchBarContainer}
-        inputContainerStyle={styles.searchBarInputContainer}
-        inputStyle={styles.searchBarInput}
-        placeholderTextColor={theme.colors.grey2}
-        clearIcon=<Icon
-          size={20}
-          type="ionicons"
-          name="close"
-          iconStyle={styles.searchBarIcon}
+      <View style={styles.searchContainer}>
+        <SearchBar
+          key="search-bar"
+          placeholder="Search"
+          value={searchText}
+          onChangeText={setSearchText}
+          platform="ios"
+          showCancel={false}
+          containerStyle={styles.searchBarContainer}
+          inputContainerStyle={styles.searchBarInputContainer}
+          inputStyle={styles.searchBarInput}
+          placeholderTextColor={theme.colors.grey2}
+          clearIcon=<Icon
+            size={20}
+            type="ionicons"
+            name="close"
+            iconStyle={styles.searchBarIcon}
+          />
+          searchIcon=<Icon
+            size={20}
+            type="ionicons"
+            name="search"
+            iconStyle={styles.searchBarIcon}
+          />
         />
-        searchIcon=<Icon
-          size={20}
-          type="ionicons"
-          name="search"
-          iconStyle={styles.searchBarIcon}
-        />
-      />
+        <TouchableOpacity style={styles.filterButton}>
+          <Icon
+            size={24}
+            type="materialicons"
+            name="filter-list"
+            iconStyle={styles.searchBarIcon}
+          />
+        </TouchableOpacity>
+      </View>
       {asyncClimbs.loading && <Loading text="Loading climbs..." />}
       {asyncClimbs.error && <Error error={asyncClimbs.error} />}
       {!asyncClimbs.loading && !asyncClimbs.error && (
@@ -98,7 +108,12 @@ export default function ClimbListScreen({}: Props) {
 }
 
 const useStyles = makeStyles((theme, _props: Props) => ({
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   searchBarContainer: {
+    flex: 1,
     height: 52,
   },
   searchBarInputContainer: {
@@ -111,6 +126,10 @@ const useStyles = makeStyles((theme, _props: Props) => ({
   },
   searchBarIcon: {
     color: theme.colors.grey2,
+  },
+  filterButton: {
+    padding: 4,
+    marginRight: 8,
   },
   angleSelectButtonText: {
     color: theme.colors.primary,
