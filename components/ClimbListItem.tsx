@@ -1,8 +1,9 @@
 import React from 'react';
 import { TouchableHighlight, View, StyleSheet, Platform } from 'react-native';
-import { Icon, makeStyles, Text, useTheme } from '@rneui/themed';
+import { makeStyles, Text, useTheme } from '@rneui/themed';
 import { DbClimb } from '../Database';
 import { match, P } from 'ts-pattern';
+import StarRating from './StarRating';
 
 type Props = {
   item: DbClimb;
@@ -23,32 +24,6 @@ export default function ClimbListItem({ item, onPress }: Props) {
           : `Set: ${item.setter_username} FA: ${item.setter_username}`,
     )
     .otherwise(() => null);
-
-  const renderStars = (rating: number) => {
-    const roundedRating = Math.round(rating * 2) / 2; // Round to nearest 0.5
-    const stars = [];
-
-    for (let starValue = 1; starValue <= 3; starValue++) {
-      let iconName = 'star-o';
-      if (roundedRating >= starValue) {
-        iconName = 'star';
-      } else if (roundedRating >= starValue - 0.5) {
-        iconName = 'star-half-empty';
-      }
-
-      stars.push(
-        <Icon
-          key={starValue}
-          color={theme.colors.star}
-          size={16}
-          type="font-awesome"
-          name={iconName}
-        />,
-      );
-    }
-
-    return stars;
-  };
 
   return (
     <TouchableHighlight
@@ -76,7 +51,7 @@ export default function ClimbListItem({ item, onPress }: Props) {
               {item.grade_name}
             </Text>
           )}
-          <View style={styles.stars}>{renderStars(item.quality_average)}</View>
+          <StarRating rating={item.quality_average || 0.0} size={16} />
         </View>
       </View>
     </TouchableHighlight>

@@ -30,12 +30,31 @@ export type DbClimb = {
   grade_name: string | null;
 };
 
+export type PlacementData = {
+  placementId: number;
+  x: number;
+  y: number;
+  position: number;
+};
+
+export type Role = {
+  id: number;
+  productId: number;
+  position: number;
+  name: string;
+  fullName: string;
+  ledColor: string;
+  screenColor: string;
+};
+
 type DatabaseContextType = {
   db: QuickSQLiteConnection | null;
   ready: boolean;
   error: string | null;
   getFilteredClimbs: (angle: number) => Promise<DbClimb[]>;
   getClimb: (uuid: string) => Promise<DbClimb | null>;
+  getPlacementData: () => Promise<Map<number, PlacementData>>;
+  getRoles: (productId: number) => Promise<Map<number, Role>>;
 };
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(
@@ -155,6 +174,89 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     return null;
   };
 
+  const getPlacementData = async (): Promise<Map<number, PlacementData>> => {
+    if (!db) {
+      console.warn('Attempting to query with no database connection.');
+      return new Map();
+    }
+
+    let { rows } = await db.executeAsync(
+      `
+      SELECT
+        placements.id as placement_id,
+        CAST(holes.x - edge_left AS FLOAT) / CAST(edge_right - edge_left AS FLOAT) AS x,
+        CAST(holes.y - edge_top AS FLOAT) / CAST(edge_bottom - edge_top AS FLOAT) AS y,
+        leds.position
+      FROM placements
+      JOIN holes ON placements.hole_id = holes.id
+      JOIN leds ON holes.id = leds.hole_id AND leds.product_size_id = 10
+      JOIN product_sizes ON product_sizes.id = leds.product_size_id
+      WHERE placements.layout_id = 1
+      `,
+      [],
+    );
+
+    const placementMap = new Map<number, PlacementData>();
+
+    if (rows) {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows.item(i);
+
+        // Map by the LED position, which corresponds to the position used in frames
+        placementMap.set(row.placement_id, {
+          placementId: row.placement_id,
+          x: row.x,
+          y: row.y,
+          position: row.position,
+        });
+      }
+    }
+
+    return placementMap;
+  };
+
+  const getRoles = async (productId: number): Promise<Map<number, Role>> => {
+    if (!db) {
+      console.warn('Attempting to query with no database connection.');
+      return new Map();
+    }
+
+    let { rows } = await db.executeAsync(
+      `
+      SELECT
+        id,
+        product_id,
+        position,
+        name,
+        full_name,
+        led_color,
+        screen_color
+      FROM placement_roles
+      WHERE product_id = ?
+      `,
+      [productId],
+    );
+
+    const rolesMap = new Map<number, Role>();
+
+    if (rows) {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows.item(i);
+        rolesMap.set(row.id, {
+          id: row.id,
+          productId: row.product_id,
+          position: row.position,
+          name: row.name,
+          fullName: row.full_name,
+          ledColor: row.led_color,
+          screenColor: row.screen_color,
+        });
+      }
+    }
+
+    return rolesMap;
+  };
+
   return (
     <DatabaseContext.Provider
       value={{
@@ -163,6 +265,8 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         error,
         getFilteredClimbs,
         getClimb,
+        getPlacementData,
+        getRoles: getRoles,
       }}
     >
       {children}
