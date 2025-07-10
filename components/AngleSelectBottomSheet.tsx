@@ -40,7 +40,7 @@ export default function AngleSelectBottomSheet({
     <BottomSheet
       isVisible={isVisible}
       onBackdropPress={onBackdropPress}
-      scrollViewProps={styles.container}
+      scrollViewProps={{ style: styles.container }}
     >
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Select Angle</Text>
