@@ -35,10 +35,12 @@ export async function getClimbsDb(angle: number) {
       climb_stats.difficulty_average,
       climb_stats.quality_average,
       climb_stats.fa_username,
-      climb_stats.fa_at
+      climb_stats.fa_at,
+      difficulty_grades.boulder_name AS grade_name
     FROM climbs
     LEFT JOIN climb_cache_fields ON climbs.uuid = climb_cache_fields.climb_uuid
     LEFT JOIN climb_stats ON climbs.uuid = climb_stats.climb_uuid AND climb_stats.angle = ?
+    LEFT JOIN difficulty_grades ON ROUND(climb_stats.display_difficulty) = difficulty_grades.difficulty
     WHERE climbs.layout_id = 1
     ORDER BY climb_stats.ascensionist_count DESC
     LIMIT 100
@@ -79,4 +81,5 @@ export type DbClimb = {
   quality_average: number | null;
   fa_username: string | null;
   fa_at: string | null;
+  grade_name: string | null;
 };

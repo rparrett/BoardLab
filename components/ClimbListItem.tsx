@@ -66,6 +66,11 @@ export default function ClimbListItem({ item, onPress }: Props) {
           </Text>
         </View>
         <View style={styles.rightColumn}>
+          {item.grade_name && (
+            <Text style={[styles.grade]}>
+              {item.grade_name}
+            </Text>
+          )}
           <View style={styles.stars}>{renderStars(item.quality_average)}</View>
         </View>
       </View>
@@ -90,6 +95,7 @@ const useStyles = makeStyles((theme, _props: Props) => ({
   rightColumn: {
     justifyContent: 'center',
     alignItems: 'flex-end',
+    gap: 4,
   },
   stars: {
     flexDirection: 'row',
@@ -99,6 +105,9 @@ const useStyles = makeStyles((theme, _props: Props) => ({
     fontSize: Platform.select({ ios: 17, default: 16 }),
   },
   subtitle: {
+    fontSize: Platform.select({ ios: 15, default: 14 }),
+  },
+  grade: {
     fontSize: Platform.select({ ios: 15, default: 14 }),
   },
 }));
