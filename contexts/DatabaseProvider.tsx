@@ -35,6 +35,7 @@ type DatabaseContextType = {
   ready: boolean;
   error: string | null;
   getFilteredClimbs: (angle: number) => Promise<DbClimb[]>;
+  getClimb: (uuid: string) => Promise<DbClimb | null>;
 };
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(
@@ -117,6 +118,43 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     return climbs;
   };
 
+  const getClimb = async (uuid: string): Promise<DbClimb | null> => {
+    if (!db) {
+      console.warn('Attempting to query with no database connection.');
+      return null;
+    }
+
+    let { rows } = await db.executeAsync(
+      `
+      SELECT
+        climbs.*,
+        climb_cache_fields.ascensionist_count AS total_ascensionist_count,
+        climb_cache_fields.display_difficulty AS total_display_difficulty,
+        climb_cache_fields.quality_average AS total_quality_average,
+        climb_stats.display_difficulty,
+        climb_stats.benchmark_difficulty,
+        climb_stats.ascensionist_count,
+        climb_stats.difficulty_average,
+        climb_stats.quality_average,
+        climb_stats.fa_username,
+        climb_stats.fa_at,
+        difficulty_grades.boulder_name AS grade_name
+      FROM climbs
+      LEFT JOIN climb_cache_fields ON climbs.uuid = climb_cache_fields.climb_uuid
+      LEFT JOIN climb_stats ON climbs.uuid = climb_stats.climb_uuid
+      LEFT JOIN difficulty_grades ON ROUND(climb_cache_fields.display_difficulty) = difficulty_grades.difficulty
+      WHERE climbs.uuid = ?
+      `,
+      [uuid],
+    );
+
+    if (rows && rows.length > 0) {
+      return rows.item(0);
+    }
+
+    return null;
+  };
+
   return (
     <DatabaseContext.Provider
       value={{
@@ -124,6 +162,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         ready,
         error,
         getFilteredClimbs,
+        getClimb,
       }}
     >
       {children}
