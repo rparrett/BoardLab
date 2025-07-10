@@ -30,7 +30,7 @@ export default function StarRating({ rating, size = 16 }: Props) {
         size={size}
         type="font-awesome"
         name={iconName}
-      />
+      />,
     );
   }
 

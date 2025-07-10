@@ -1,10 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
-import {
-  BottomSheet,
-  ListItem,
-  makeStyles,
-} from '@rneui/themed';
+import { BottomSheet, ListItem, makeStyles } from '@rneui/themed';
 import BottomSheetHeader from './BottomSheetHeader';
 
 type AngleOption = {
@@ -27,7 +22,11 @@ export default function AngleSelectBottomSheet({
 }: Props) {
   const styles = useStyles();
 
-  const generateAngleOptions = (min: number, max: number, step: number): AngleOption[] => {
+  const generateAngleOptions = (
+    min: number,
+    max: number,
+    step: number,
+  ): AngleOption[] => {
     const options: AngleOption[] = [];
     for (let angle = min; angle <= max; angle += step) {
       options.push({ label: `${angle}°`, value: angle });

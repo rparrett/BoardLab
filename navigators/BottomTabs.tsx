@@ -13,7 +13,12 @@ const BottomTabs = createBottomTabNavigator({
       options: {
         headerShown: false,
         tabBarIcon: ({ color, size }) => (
-          <Icon name="sports-handball" type="material" color={color} size={size} />
+          <Icon
+            name="sports-handball"
+            type="material"
+            color={color}
+            size={size}
+          />
         ),
       },
     },
