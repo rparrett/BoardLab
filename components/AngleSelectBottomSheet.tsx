@@ -29,12 +29,15 @@ export default function AngleSelectBottomSheet({
 }: Props) {
   const styles = useStyles();
 
-  const angleOptions: AngleOption[] = [
-    ...Array.from({ length: 15 }, (_, i) => {
-      const angle = i * 5;
-      return { label: `${angle}°`, value: angle };
-    }),
-  ];
+  const generateAngleOptions = (min: number, max: number, step: number): AngleOption[] => {
+    const options: AngleOption[] = [];
+    for (let angle = min; angle <= max; angle += step) {
+      options.push({ label: `${angle}°`, value: angle });
+    }
+    return options;
+  };
+
+  const angleOptions = generateAngleOptions(0, 70, 5);
 
   return (
     <BottomSheet
