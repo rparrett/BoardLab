@@ -9,13 +9,14 @@ import ClimbListItem from '../components/ClimbListItem';
 import Loading from '../components/Loading';
 import Error from '../components/Error';
 import { useAsync } from 'react-async-hook';
+import { useAppState } from '../stores/AppState';
 
 type Props = StaticScreenProps<{}>;
 
 export default function ClimbListScreen({}: Props) {
   const navigation = useNavigation<ClimbsStackNavigationProp>();
   const { getFilteredClimbs, ready } = useDatabase();
-  const [selectedAngle, setSelectedAngle] = useState(40);
+  const { selectedAngle, setSelectedAngle } = useAppState();
   const [isVisible, setIsVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
 
