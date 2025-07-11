@@ -8,6 +8,7 @@ PODS:
   - hermes-engine (0.80.1):
     - hermes-engine/Pre-built (= 0.80.1)
   - hermes-engine/Pre-built (0.80.1)
+  - MultiplatformBleAdapter (0.2.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1648,6 +1649,36 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
+  - react-native-ble-plx (3.5.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - MultiplatformBleAdapter (= 0.2.0)
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - react-native-quick-sqlite (8.2.7):
     - boost
     - DoubleConversion
@@ -2436,6 +2467,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-ble-plx (from `../node_modules/react-native-ble-plx`)
   - react-native-quick-sqlite (from `../node_modules/react-native-quick-sqlite`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -2479,6 +2511,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - MultiplatformBleAdapter
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -2563,6 +2596,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-ble-plx:
+    :path: "../node_modules/react-native-ble-plx"
   react-native-quick-sqlite:
     :path: "../node_modules/react-native-quick-sqlite"
   react-native-safe-area-context:
@@ -2650,6 +2685,7 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 4f07404533b808de66cf48ac4200463068d0e95a
+  MultiplatformBleAdapter: b1fddd0d499b96b607e00f0faa8e60648343dc1d
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: efa5010912100e944a7ac9a93a157e1def1988fe
   RCTRequired: bbc4cf999ddc4a4b076e076c74dd1d39d0254630
@@ -2683,6 +2719,7 @@ SPEC CHECKSUMS:
   React-logger: 984ebd897afad067555d081deaf03f57c4315723
   React-Mapbuffer: 0c045c844ce6d85cde53e85ab163294c6adad349
   React-microtasksnativemodule: d9499269ad1f484ae71319bac1d9231447f2094e
+  react-native-ble-plx: ce6e9f26a6543199e3f0c70afa3964c3a53f4a0b
   react-native-quick-sqlite: 263402c4c603ad7004ae2ba6b61303df5c9ac67b
   react-native-safe-area-context: d3738f0c3b1fcefaed874a45891b0d44306c47c1
   React-NativeModulesApple: 983f3483ef0a3446b56d490f09d579fba2442e17

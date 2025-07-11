@@ -3,12 +3,13 @@ import {
   DarkTheme,
   DefaultTheme,
 } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import BottomTabs, { BottomTabsParamList } from './navigators/BottomTabs';
 import { useColorScheme } from 'react-native';
 import { createTheme, ThemeProvider, useTheme } from '@rneui/themed';
 import { DatabaseProvider } from './contexts/DatabaseProvider';
+import { useBluetoothState } from './stores/BluetoothState';
 
 const Navigation = () => {
   let { theme } = useTheme();
@@ -36,6 +37,13 @@ const theme = createTheme({
 export default function App() {
   const scheme = useColorScheme();
   theme.mode = scheme === 'dark' ? 'dark' : 'light';
+
+  // Initialize Bluetooth once at app level
+  useEffect(() => {
+    const { initializeBluetooth, cleanup } = useBluetoothState.getState();
+    initializeBluetooth();
+    return cleanup;
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>

@@ -1,13 +1,15 @@
-import { StaticScreenProps } from '@react-navigation/native';
+import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import { Text, Icon } from '@rneui/themed';
 import { StyleSheet, View, Image } from 'react-native';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
-import { useState } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import Loading from '../components/Loading';
 import Error from '../components/Error';
 import StarRating from '../components/StarRating';
 import ImageZoom from 'react-native-image-pan-zoom';
+import BluetoothBottomSheet from '../components/BluetoothBottomSheet';
+import BluetoothHeaderButton from '../components/BluetoothHeaderButton';
 
 type Props = StaticScreenProps<{
   uuid: string;
@@ -16,17 +18,14 @@ type Props = StaticScreenProps<{
 export default function ClimbScreen({ route }: Props) {
   let { params } = route;
   let { uuid } = params;
+  const navigation = useNavigation();
   const { getClimb, getPlacementData, getRoles, ready } = useDatabase();
+
+  // All hooks must be at the top, before any early returns
   const [containerDimensions, setContainerDimensions] = useState({
     width: 0,
     height: 0,
   });
-
-  const imageWidth = 1080.0;
-  const imageHeight = 1170.0;
-
-  const scale = containerDimensions.width / imageWidth;
-  const scaledImageHeight = imageHeight * scale;
 
   const asyncClimb = useAsync(() => {
     return getClimb(uuid);
@@ -40,6 +39,14 @@ export default function ClimbScreen({ route }: Props) {
     return getRoles(1);
   }, [ready]);
 
+  // Header button
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <BluetoothHeaderButton />,
+    });
+  }, [navigation]);
+
+  // Early returns after all hooks
   if (asyncClimb.loading || asyncPlacementData.loading || asyncRoles.loading) {
     return <Loading text="Loading climb..." />;
   }
@@ -76,6 +83,12 @@ export default function ClimbScreen({ route }: Props) {
 
   const placements = parseFrames(climb.frames);
 
+  const imageWidth = 1080.0;
+  const imageHeight = 1170.0;
+
+  const scale = containerDimensions.width / imageWidth;
+  const scaledImageHeight = imageHeight * scale;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -99,6 +112,7 @@ export default function ClimbScreen({ route }: Props) {
         }}
       >
         {containerDimensions.width > 0 && (
+          // @ts-expect-error: TS2769 react-native-image-pan-zoom has incorrect TypeScript definitions
           <ImageZoom
             cropWidth={containerDimensions.width}
             cropHeight={containerDimensions.height}
@@ -161,6 +175,7 @@ export default function ClimbScreen({ route }: Props) {
           </ImageZoom>
         )}
       </View>
+      <BluetoothBottomSheet />
     </View>
   );
 }
