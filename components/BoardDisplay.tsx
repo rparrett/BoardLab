@@ -9,6 +9,8 @@ export interface PlacementPressEvent {
   originalEvent: any;
   placementId: number;
   currentRoleId: number | null;
+  placementX: number;
+  placementY: number;
 }
 
 interface BoardDisplayProps {
@@ -137,11 +139,21 @@ export default function BoardDisplay({
 
     if (placementId !== null) {
       const currentRoleId = placements.get(placementId) || null;
-      onPress({
-        originalEvent: event,
-        placementId,
-        currentRoleId,
-      });
+      const placement = placementData?.get(placementId);
+
+      if (placement) {
+        const placementX =
+          imageOffsetX + placement.x * containerDimensions.width;
+        const placementY = imageOffsetY + placement.y * scaledImageHeight;
+
+        onPress({
+          originalEvent: event,
+          placementId,
+          currentRoleId,
+          placementX,
+          placementY,
+        });
+      }
     }
   };
 
@@ -160,11 +172,21 @@ export default function BoardDisplay({
 
     if (placementId !== null) {
       const currentRoleId = placements.get(placementId) || null;
-      onLongPress({
-        originalEvent: event,
-        placementId,
-        currentRoleId,
-      });
+      const placement = placementData?.get(placementId);
+
+      if (placement) {
+        const placementX =
+          imageOffsetX + placement.x * containerDimensions.width;
+        const placementY = imageOffsetY + placement.y * scaledImageHeight;
+
+        onLongPress({
+          originalEvent: event,
+          placementId,
+          currentRoleId,
+          placementX,
+          placementY,
+        });
+      }
     }
   };
 
