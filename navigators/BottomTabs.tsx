@@ -3,6 +3,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import ClimbsStack from './ClimbsStack';
 import { StaticParamList } from '@react-navigation/native';
 import { Icon } from '@rneui/themed';
+import CreateScreen from '../screens/CreateScreen';
 
 export type BottomTabsParamList = StaticParamList<typeof BottomTabs>;
 
@@ -19,6 +20,14 @@ const BottomTabs = createBottomTabNavigator({
             color={color}
             size={size}
           />
+        ),
+      },
+    },
+    Create: {
+      screen: CreateScreen,
+      options: {
+        tabBarIcon: ({ color, size }) => (
+          <Icon name="add-box" type="material" color={color} size={size} />
         ),
       },
     },

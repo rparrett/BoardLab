@@ -1,0 +1,2 @@
+- Use `yarn`, NOT `npm`
+- Use `nvm use && yarn` to select the proper node version when running yarn
