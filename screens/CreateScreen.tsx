@@ -66,7 +66,7 @@ export default function CreateScreen({}: Props) {
             style={styles.clearButton}
           >
             <Icon
-              name="recycle"
+              name="backspace"
               type="materialicons"
               size={24}
               color="#FF5722"
