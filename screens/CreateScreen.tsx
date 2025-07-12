@@ -18,6 +18,7 @@ import { useAppState } from '../stores/AppState';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
 import { useLayoutEffect, useState } from 'react';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 type Props = StaticScreenProps<{
   uuid: string | undefined;
@@ -33,6 +34,7 @@ export default function CreateScreen({}: Props) {
     clearClimbInProgress,
   } = useAppState();
   const { getRoles, ready } = useDatabase();
+  const headerHeight = useHeaderHeight();
 
   const [radialMenuVisible, setRadialMenuVisible] = useState(false);
   const [radialMenuPosition, setRadialMenuPosition] = useState({ x: 0, y: 0 });
@@ -124,9 +126,11 @@ export default function CreateScreen({}: Props) {
   const handleLongPress = (event: PlacementPressEvent) => {
     console.log('Long pressed placement:', event.placementId);
 
-    // Use placement coordinates for consistent menu positioning
     setSelectedPlacementId(event.placementId);
-    setRadialMenuPosition({ x: event.placementX, y: event.placementY });
+    setRadialMenuPosition({
+      x: event.placementScreenX,
+      y: event.placementScreenY - headerHeight,
+    });
     setRadialMenuVisible(true);
   };
 

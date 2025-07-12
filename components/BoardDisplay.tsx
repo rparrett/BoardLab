@@ -9,8 +9,8 @@ export interface PlacementPressEvent {
   originalEvent: any;
   placementId: number;
   currentRoleId: number | null;
-  placementX: number;
-  placementY: number;
+  placementScreenX: number;
+  placementScreenY: number;
 }
 
 interface BoardDisplayProps {
@@ -33,6 +33,8 @@ export default function BoardDisplay({
     width: 0,
     height: 0,
   });
+  const [zoomableRef, setZoomableRef] =
+    useState<ReactNativeZoomableView | null>(null);
 
   const [isLongPressing, setIsLongPressing] = useState(false);
 
@@ -121,6 +123,39 @@ export default function BoardDisplay({
     return minDistance <= maxTapDistance ? closestPlacementId : null;
   };
 
+  // This is incredibly janky, perhaps a result of me not really understanding how the
+  // offsets in ReactNativeZoomableView work.
+  //
+  // It feels like this should be possible just by applying RNZV's `offsetX` and `offsetY`,
+  // and `zoomLevel` to the `viewPlacementX`, but I clearly don't understand what's going
+  // on in this component because I can't get that to produce values that make sense.
+  const normalizedPlacementToScreen = (
+    placementX: number,
+    placementY: number,
+    tapX: number,
+    tapY: number,
+    tapScreenX: number,
+    tapScreenY: number,
+  ): { x: number; y: number } => {
+    const viewPlacementX =
+      imageOffsetX + placementX * containerDimensions.width;
+    const viewPlacementY = imageOffsetY + placementY * scaledImageHeight;
+
+    let diffX = viewPlacementX - tapX;
+    let diffY = viewPlacementY - tapY;
+
+    let scaledDiffX = diffX * zoomableRef?.zoomLevel ?? 1.0;
+    let scaledDiffY = diffY * zoomableRef?.zoomLevel ?? 1.0;
+
+    let placementScreenX = tapScreenX + scaledDiffX;
+    let placementScreenY = tapScreenY + scaledDiffY;
+
+    return {
+      x: placementScreenX,
+      y: placementScreenY,
+    };
+  };
+
   const handlePress = (event: any) => {
     if (!onPress) return;
 
@@ -142,16 +177,21 @@ export default function BoardDisplay({
       const placement = placementData?.get(placementId);
 
       if (placement) {
-        const placementX =
-          imageOffsetX + placement.x * containerDimensions.width;
-        const placementY = imageOffsetY + placement.y * scaledImageHeight;
+        let placementScreen = normalizedPlacementToScreen(
+          placement.x,
+          placement.y,
+          tapX,
+          tapY,
+          event.nativeEvent.screenX,
+          event.nativeEvent.screenY,
+        );
 
         onPress({
           originalEvent: event,
           placementId,
           currentRoleId,
-          placementX,
-          placementY,
+          placementScreenX: placementScreen.x,
+          placementScreenY: placementScreen.y,
         });
       }
     }
@@ -175,16 +215,21 @@ export default function BoardDisplay({
       const placement = placementData?.get(placementId);
 
       if (placement) {
-        const placementX =
-          imageOffsetX + placement.x * containerDimensions.width;
-        const placementY = imageOffsetY + placement.y * scaledImageHeight;
+        let placementScreen = normalizedPlacementToScreen(
+          placement.x,
+          placement.y,
+          tapX,
+          tapY,
+          event.nativeEvent.screenX,
+          event.nativeEvent.screenY,
+        );
 
         onLongPress({
           originalEvent: event,
           placementId,
           currentRoleId,
-          placementX,
-          placementY,
+          placementScreenX: placementScreen.x,
+          placementScreenY: placementScreen.y,
         });
       }
     }
@@ -200,6 +245,7 @@ export default function BoardDisplay({
     >
       {containerDimensions.width > 0 && (
         <ReactNativeZoomableView
+          ref={r => setZoomableRef(r)}
           maxZoom={4}
           minZoom={1}
           zoomStep={1.5}
