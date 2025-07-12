@@ -67,12 +67,7 @@ export default function CreateScreen({}: Props) {
             onPress={clearClimbInProgress}
             style={styles.clearButton}
           >
-            <Icon
-              name="backspace"
-              type="materialicons"
-              size={24}
-              color="#FF5722"
-            />
+            <Icon name="eraser" type="material-community" size={24} />
           </TouchableOpacity>
         </View>
       ),
