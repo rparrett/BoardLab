@@ -27,7 +27,7 @@ interface RadialMenuProps {
   containerHeight?: number;
   minRadius?: number;
   maxRadius?: number;
-  ref?: React.RefObject<RadialMenuRef>;
+  ref?: React.RefObject<RadialMenuRef | null>;
 }
 
 export default function RadialMenu({
