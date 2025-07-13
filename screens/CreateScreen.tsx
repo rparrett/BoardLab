@@ -99,52 +99,6 @@ export default function CreateScreen({}: Props) {
   }, [navigation, clearClimbInProgress]);
 
   const handlePress = (event: PlacementPressEvent) => {
-    if (!asyncRoles.result) return;
-
-    const roles = Array.from(asyncRoles.result.values());
-    let nextRoleId = null;
-
-    if (event.currentRoleId === null) {
-      // No role assigned, assign first role
-      nextRoleId = roles[0].id;
-      updatePlacement(event.placementId, nextRoleId);
-    } else {
-      // Find current role index and cycle to next
-      const currentIndex = roles.findIndex(
-        role => role.id === event.currentRoleId,
-      );
-
-      if (currentIndex === -1) {
-        // Current role not found, assign first role
-        nextRoleId = roles[0].id;
-        updatePlacement(event.placementId, nextRoleId);
-      } else if (currentIndex === roles.length - 1) {
-        // Last role, remove placement (cycle back to empty)
-        nextRoleId = null;
-        removePlacement(event.placementId);
-      } else {
-        // Cycle to next role
-        nextRoleId = roles[currentIndex + 1].id;
-        updatePlacement(event.placementId, nextRoleId);
-      }
-    }
-
-    console.log(
-      'Tapped placement:',
-      event.placementId,
-      'current role:',
-      event.currentRoleId,
-      'next role:',
-      nextRoleId,
-      'x/y:',
-      event.originalEvent.nativeEvent.locationX,
-      event.originalEvent.nativeEvent.locationY,
-    );
-  };
-
-  const handleLongPress = (event: PlacementPressEvent) => {
-    console.log('Long pressed placement:', event.placementId);
-
     setSelectedPlacementId(event.placementId);
     setRadialMenuPosition({
       x: event.placementScreenX,
@@ -188,11 +142,7 @@ export default function CreateScreen({}: Props) {
         setContainerDimensions({ width, height });
       }}
     >
-      <BoardDisplay
-        placements={climbInProgress}
-        onLongPress={handleLongPress}
-        onPress={handlePress}
-      />
+      <BoardDisplay placements={climbInProgress} onPress={handlePress} />
       <BluetoothBottomSheet />
 
       <RadialMenu

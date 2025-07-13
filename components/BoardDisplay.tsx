@@ -252,6 +252,7 @@ export default function BoardDisplay({
           initialZoom={1}
           bindToBorders={true}
           disablePanOnInitialZoom={true}
+          visualTouchFeedbackEnabled={false}
           onSingleTap={handlePress}
           onLongPress={handleLongPress}
         >
