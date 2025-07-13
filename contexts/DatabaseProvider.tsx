@@ -257,6 +257,51 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    // Add mock special roles for testing
+    const mockSpecialRoles: Role[] = [
+      {
+        id: 99,
+        productId: productId,
+        position: 99,
+        name: 'Matching',
+        fullName: 'Matching Allowed',
+        ledColor: 'FFFFFF',
+        screenColor: '000000',
+      },
+      {
+        id: 98,
+        productId: productId,
+        position: 98,
+        name: 'Easy Mode',
+        fullName: 'Easy Mode',
+        ledColor: 'FF0000',
+        screenColor: 'FF0000',
+      },
+      {
+        id: 97,
+        productId: productId,
+        position: 97,
+        name: 'Purple',
+        fullName: 'Purple',
+        ledColor: '9370DB',
+        screenColor: '9370DB',
+      },
+      {
+        id: 96,
+        productId: productId,
+        position: 96,
+        name: 'Blue',
+        fullName: 'Blue',
+        ledColor: '3B82F6',
+        screenColor: '3B82F6',
+      },
+    ];
+
+    // Add special roles to the map
+    mockSpecialRoles.forEach(role => {
+      rolesMap.set(role.id, role);
+    });
+
     return rolesMap;
   };
 

@@ -13,11 +13,12 @@ import {
   RadialMenu,
   RadialMenuCenter,
   RadialMenuItem,
+  type RadialMenuRef,
 } from '../components/RadialMenu';
 import { useAppState } from '../stores/AppState';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useHeaderHeight } from '@react-navigation/elements';
 
 type Props = StaticScreenProps<{
@@ -45,6 +46,8 @@ export default function CreateScreen({}: Props) {
     width: 0,
     height: 0,
   });
+  const [showSpecialMenu, setShowSpecialMenu] = useState(false);
+  const menuRef = useRef<RadialMenuRef>(null);
 
   const asyncRoles = useAsync(() => {
     return getRoles(1);
@@ -55,6 +58,27 @@ export default function CreateScreen({}: Props) {
     12: { iconName: 'play', iconType: 'ionicon' },
     14: { iconName: 'stop', iconType: 'ionicon' },
     15: { iconName: 'footsteps', iconType: 'ionicon' },
+    99: { iconName: 'hands-pray', iconType: 'material-community' },
+    98: { iconName: 'child-friendly', iconType: 'materialicons' },
+    97: { iconName: 'flag', iconType: 'materialicons' },
+    96: { iconName: 'circle', iconType: 'materialicons' },
+  };
+
+  // Define which roles are special (non-standard)
+  const specialRoleIds = [99, 98, 97, 96];
+
+  // Filter roles based on current menu mode
+  const getFilteredRoles = () => {
+    if (!asyncRoles.result) return [];
+    const allRoles = Array.from(asyncRoles.result.values());
+
+    if (showSpecialMenu) {
+      // For special menu, show only special roles
+      return allRoles.filter(role => specialRoleIds.includes(role.id));
+    } else {
+      // For standard menu, filter out any special role IDs
+      return allRoles.filter(role => !specialRoleIds.includes(role.id));
+    }
   };
 
   // Header buttons
@@ -132,6 +156,12 @@ export default function CreateScreen({}: Props) {
   const closeRadialMenu = () => {
     setRadialMenuVisible(false);
     setSelectedPlacementId(null);
+    setShowSpecialMenu(false); // Reset to standard menu when closing
+  };
+
+  const toggleMenuMode = () => {
+    setShowSpecialMenu(!showSpecialMenu);
+    menuRef.current?.bounce();
   };
 
   const handleRoleSelect = (roleId: number) => {
@@ -172,42 +202,62 @@ export default function CreateScreen({}: Props) {
         onClose={closeRadialMenu}
         containerWidth={containerDimensions.width}
         containerHeight={containerDimensions.height}
+        ref={menuRef}
       >
         <RadialMenuCenter
           backgroundColor={
             colorScheme === 'dark'
-              ? 'rgba(255, 255, 255, 0.2)'
-              : 'rgba(0, 0, 0, 0.4)'
+              ? 'rgba(255, 255, 255, 0.6)'
+              : 'rgba(0, 0, 0, 0.6)'
           }
         />
+        {/* Toggle button for switching between standard and special menus */}
+        <RadialMenuItem
+          onPress={toggleMenuMode}
+          iconName="more-horiz"
+          iconType="materialicons"
+          iconColor="#fff"
+          backgroundColor="#666"
+        />
 
-        {asyncRoles.result &&
-          Array.from(asyncRoles.result.values()).map(role => {
-            const roleIcon = roleIconMap[role.id] || {
-              iconName: 'circle',
-              iconType: 'materialicons',
-            };
-            return (
-              <RadialMenuItem
-                key={role.id}
-                onPress={handleRoleSelect(role.id)}
-                iconName={roleIcon.iconName}
-                iconType={roleIcon.iconType}
-                iconColor="#fff"
-                backgroundColor={`#${role.screenColor}`}
-              />
-            );
-          })}
-        {selectedPlacementId !== null &&
-          climbInProgress.has(selectedPlacementId) && (
+        <RadialMenuItem
+          onPress={
+            selectedPlacementId !== null &&
+            climbInProgress.has(selectedPlacementId)
+              ? handleRemovePlacement
+              : () => {} // No-op when disabled
+          }
+          iconName="delete"
+          iconType="materialicons"
+          iconColor={
+            selectedPlacementId !== null &&
+            climbInProgress.has(selectedPlacementId)
+              ? '#fff'
+              : '#999'
+          }
+          backgroundColor={
+            selectedPlacementId !== null &&
+            climbInProgress.has(selectedPlacementId)
+              ? '#999'
+              : '#666'
+          }
+        />
+        {getFilteredRoles().map(role => {
+          const roleIcon = roleIconMap[role.id] || {
+            iconName: 'circle',
+            iconType: 'materialicons',
+          };
+          return (
             <RadialMenuItem
-              onPress={handleRemovePlacement}
-              iconName="delete"
-              iconType="materialicons"
+              key={role.id}
+              onPress={handleRoleSelect(role.id)}
+              iconName={roleIcon.iconName}
+              iconType={roleIcon.iconType}
               iconColor="#fff"
-              backgroundColor="#FF5722"
+              backgroundColor={`#${role.screenColor}`}
             />
-          )}
+          );
+        })}
       </RadialMenu>
     </View>
   );

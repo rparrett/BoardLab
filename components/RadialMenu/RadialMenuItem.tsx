@@ -17,6 +17,8 @@ interface RadialMenuItemProps {
   y?: number;
   /** @internal Managed by RadialMenu - overrides any value provided */
   animationDelay?: number;
+  /** @internal Managed by RadialMenu - overrides any value provided */
+  bounceScaleAnim?: Animated.Value;
 }
 
 export default function RadialMenuItem({
@@ -30,9 +32,14 @@ export default function RadialMenuItem({
   x = 0,
   y = 0,
   animationDelay = 0,
+  bounceScaleAnim,
 }: RadialMenuItemProps) {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const positionAnim = useRef(new Animated.Value(0)).current;
+
+  const combinedScale = bounceScaleAnim
+    ? Animated.multiply(scaleAnim, bounceScaleAnim)
+    : scaleAnim;
 
   useEffect(() => {
     Animated.parallel([
@@ -71,7 +78,7 @@ export default function RadialMenuItem({
                 outputRange: [0, y],
               }),
             },
-            { scale: scaleAnim },
+            { scale: combinedScale },
           ],
         },
       ]}

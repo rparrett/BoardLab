@@ -13,6 +13,10 @@ import {
   type Rectangle,
 } from './geometry';
 
+export interface RadialMenuRef {
+  bounce: () => void;
+}
+
 interface RadialMenuProps {
   visible: boolean;
   centerX: number;
@@ -23,6 +27,7 @@ interface RadialMenuProps {
   containerHeight?: number;
   minRadius?: number;
   maxRadius?: number;
+  ref?: React.RefObject<RadialMenuRef>;
 }
 
 export default function RadialMenu({
@@ -35,9 +40,11 @@ export default function RadialMenu({
   containerHeight,
   minRadius = 70,
   maxRadius = 200,
+  ref,
 }: RadialMenuProps) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0)).current;
+  const bounceScaleAnim = useRef(new Animated.Value(1)).current;
 
   const screenDimensions = Dimensions.get('window');
   const itemSize = 50; // Overrides the size in RadialMenuItem
@@ -48,7 +55,9 @@ export default function RadialMenu({
   const { radius, startAngle, arcSpan } = useMemo(() => {
     const totalItems = React.Children.toArray(children).filter(child => {
       return (
-        React.isValidElement(child) && child.type.name === 'RadialMenuItem'
+        React.isValidElement(child) &&
+        typeof child.type !== 'string' &&
+        child.type.name === 'RadialMenuItem'
       );
     }).length;
 
@@ -151,6 +160,27 @@ export default function RadialMenu({
     }
   }, [visible, fadeAnim, scaleAnim]);
 
+  useEffect(() => {
+    if (ref) {
+      ref.current = {
+        bounce: () => {
+          Animated.sequence([
+            Animated.timing(bounceScaleAnim, {
+              toValue: 1.2,
+              duration: 100,
+              useNativeDriver: true,
+            }),
+            Animated.timing(bounceScaleAnim, {
+              toValue: 1,
+              duration: 100,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        },
+      };
+    }
+  }, [ref]);
+
   if (!visible) return null;
 
   return (
@@ -178,7 +208,9 @@ export default function RadialMenu({
           React.Children.forEach(children, child => {
             if (
               React.isValidElement(child) &&
-              child.props.iconName !== undefined
+              typeof child.props === 'object' &&
+              child.props !== null &&
+              'iconName' in child.props
             ) {
               menuItems.push(child);
             } else {
@@ -190,7 +222,7 @@ export default function RadialMenu({
             ...otherChildren.map((child, index) => {
               if (React.isValidElement(child)) {
                 return React.cloneElement(child, {
-                  ...child.props,
+                  ...(child.props as any),
                   key: `other-${index}`,
                   onClose,
                 });
@@ -212,12 +244,13 @@ export default function RadialMenu({
               const animationDelay = 100 + index * 50;
 
               return React.cloneElement(child, {
-                ...child.props,
+                ...(child.props as any),
                 key: `menu-${index}`,
                 x,
                 y,
                 animationDelay,
                 size: itemSize,
+                bounceScaleAnim,
               });
             }),
           ];

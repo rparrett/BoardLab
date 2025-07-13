@@ -5,12 +5,14 @@ interface RadialMenuCenterProps {
   onClose?: () => void;
   size?: number;
   backgroundColor?: string;
+  borderWidth?: number;
 }
 
 export default function RadialMenuCenter({
   onClose,
   size = 50,
   backgroundColor = 'rgba(0, 0, 0, 0.4)',
+  borderWidth = 9,
 }: RadialMenuCenterProps) {
   const scaleAnim = useRef(new Animated.Value(0)).current;
 
@@ -33,7 +35,9 @@ export default function RadialMenuCenter({
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor,
+          backgroundColor: 'transparent',
+          borderWidth,
+          borderColor: backgroundColor,
         },
       ]}
       activeOpacity={0.8}
