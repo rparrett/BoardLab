@@ -8,6 +8,7 @@ interface AppState {
   setClimbFilters: (filters: ClimbFilters) => void;
   setAngle: (angle: number) => void;
   setSearchText: (searchText: string) => void;
+  setGrades: (grades: number[]) => void;
 
   // Climb creation state
   climbInProgress: Map<number, number>; // placement ID -> role ID
@@ -27,13 +28,17 @@ interface AppState {
 export const useAppState = create<AppState>()(
   persist(
     set => ({
-      climbFilters: { angle: 40, search: '' },
+      climbFilters: { angle: 40, search: '', grades: [] },
       setClimbFilters: filters => set({ climbFilters: filters }),
       setAngle: angle =>
         set(state => ({ climbFilters: { ...state.climbFilters, angle } })),
       setSearchText: searchText =>
         set(state => ({
           climbFilters: { ...state.climbFilters, search: searchText },
+        })),
+      setGrades: grades =>
+        set(state => ({
+          climbFilters: { ...state.climbFilters, grades },
         })),
 
       // Climb creation state

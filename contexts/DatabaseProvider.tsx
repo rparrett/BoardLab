@@ -48,9 +48,15 @@ export type Role = {
   screenColor: string;
 };
 
+export type GradeOption = {
+  difficulty: number;
+  name: string;
+};
+
 export type ClimbFilters = {
   angle: number;
   search: string;
+  grades: number[]; // Array of selected difficulty values, empty array means no filter
 };
 
 type DatabaseContextType = {
@@ -63,6 +69,7 @@ type DatabaseContextType = {
   getClimb: (uuid: string) => Promise<DbClimb | null>;
   getPlacementData: () => Promise<Map<number, PlacementData>>;
   getRoles: (productId: number) => Promise<Map<number, Role>>;
+  getAvailableGrades: () => Promise<GradeOption[]>;
 };
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(
@@ -114,6 +121,17 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
 
     const climbs: DbClimb[] = [];
 
+    // Build the WHERE clause dynamically based on filters
+    let whereClause = 'WHERE climbs.layout_id = 1 AND climbs.name LIKE ?';
+    let params: any[] = [filters.angle, `%${filters.search}%`];
+
+    // Add grade filter if provided
+    if (filters.grades && filters.grades.length > 0) {
+      const gradeParams = filters.grades.map(() => '?').join(', ');
+      whereClause += ` AND difficulty_grades.difficulty IN (${gradeParams})`;
+      params.push(...filters.grades);
+    }
+
     let { rows } = await db.executeAsync(
       `
       SELECT
@@ -133,11 +151,11 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       LEFT JOIN climb_cache_fields ON climbs.uuid = climb_cache_fields.climb_uuid
       LEFT JOIN climb_stats ON climbs.uuid = climb_stats.climb_uuid AND climb_stats.angle = ?
       LEFT JOIN difficulty_grades ON ROUND(climb_stats.display_difficulty) = difficulty_grades.difficulty
-      WHERE climbs.layout_id = 1 AND climbs.name LIKE ?
+      ${whereClause}
       ORDER BY climb_stats.ascensionist_count DESC
       LIMIT 100
       `,
-      [filters.angle, `%${filters.search}%`],
+      params,
     );
 
     if (rows) {
@@ -315,6 +333,36 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     return rolesMap;
   };
 
+  const getAvailableGrades = async (): Promise<GradeOption[]> => {
+    if (!db) {
+      console.warn('Attempting to query with no database connection.');
+      return [];
+    }
+
+    let { rows } = await db.executeAsync(
+      `
+      SELECT difficulty, boulder_name
+      FROM difficulty_grades
+      WHERE boulder_name IS NOT NULL AND is_listed = 1
+      ORDER BY difficulty ASC
+      `,
+      [],
+    );
+
+    const grades: GradeOption[] = [];
+    if (rows) {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows.item(i);
+        grades.push({
+          difficulty: row.difficulty,
+          name: row.boulder_name,
+        });
+      }
+    }
+
+    return grades;
+  };
+
   return (
     <DatabaseContext.Provider
       value={{
@@ -325,6 +373,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         getClimb,
         getPlacementData,
         getRoles: getRoles,
+        getAvailableGrades,
       }}
     >
       {children}

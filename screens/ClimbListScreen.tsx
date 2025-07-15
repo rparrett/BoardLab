@@ -1,13 +1,11 @@
 import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
-import {
-  DbClimb,
-  useDatabase,
-} from '../contexts/DatabaseProvider';
+import { DbClimb, useDatabase } from '../contexts/DatabaseProvider';
 import { useLayoutEffect, useState } from 'react';
 import { Text, SearchBar, Icon, useTheme, makeStyles } from '@rn-vui/themed';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
+import FiltersBottomSheet from '../components/FiltersBottomSheet';
 import ClimbListItem from '../components/ClimbListItem';
 import Loading from '../components/Loading';
 import Error from '../components/Error';
@@ -20,7 +18,8 @@ export default function ClimbListScreen({}: Props) {
   const navigation = useNavigation<ClimbsStackNavigationProp>();
   const { getFilteredClimbs, ready } = useDatabase();
   const { climbFilters, setAngle, setSearchText } = useAppState();
-  const [isVisible, setIsVisible] = useState(false);
+  const [isAngleSelectVisible, setIsAngleSelectVisible] = useState(false);
+  const [isFiltersVisible, setIsFiltersVisible] = useState(false);
 
   const { theme } = useTheme();
   const styles = useStyles();
@@ -32,8 +31,10 @@ export default function ClimbListScreen({}: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => setIsVisible(true)}>
-          <Text style={styles.angleSelectButtonText}>{climbFilters.angle}°</Text>
+        <TouchableOpacity onPress={() => setIsAngleSelectVisible(true)}>
+          <Text style={styles.angleSelectButtonText}>
+            {climbFilters.angle}°
+          </Text>
         </TouchableOpacity>
       ),
     });
@@ -45,16 +46,14 @@ export default function ClimbListScreen({}: Props) {
     return (
       <ClimbListItem
         item={item}
-        onPress={() =>
-          navigation.navigate('Climb', { uuid: item.uuid })
-        }
+        onPress={() => navigation.navigate('Climb', { uuid: item.uuid })}
       />
     );
   };
 
   const handleSelect = (option: { label: string; value: number }) => {
     setAngle(option.value);
-    setIsVisible(false);
+    setIsAngleSelectVisible(false);
   };
 
   return (
@@ -84,7 +83,10 @@ export default function ClimbListScreen({}: Props) {
             iconStyle={styles.searchBarIcon}
           />
         />
-        <TouchableOpacity style={styles.filterButton}>
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() => setIsFiltersVisible(true)}
+        >
           <Icon
             size={24}
             type="materialicons"
@@ -103,10 +105,14 @@ export default function ClimbListScreen({}: Props) {
         />
       )}
       <AngleSelectBottomSheet
-        isVisible={isVisible}
+        isVisible={isAngleSelectVisible}
         selectedAngle={climbFilters.angle}
         onSelect={handleSelect}
-        onBackdropPress={() => setIsVisible(false)}
+        onBackdropPress={() => setIsAngleSelectVisible(false)}
+      />
+      <FiltersBottomSheet
+        isVisible={isFiltersVisible}
+        onBackdropPress={() => setIsFiltersVisible(false)}
       />
     </View>
   );
