@@ -28,17 +28,18 @@ export default function ClimbListScreen({}: Props) {
 
   const activeFilterCount = climbFilters.grades?.length > 0 ? 1 : 0;
 
+  const { theme } = useTheme();
+  const styles = useStyles();
+
   const BadgedIcon = withBadge(activeFilterCount, {
     hidden: activeFilterCount === 0,
     status: 'primary',
     top: -2,
     right: -2,
+    badgeStyle: styles.badge,
   })(Icon);
   const [isAngleSelectVisible, setIsAngleSelectVisible] = useState(false);
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
-
-  const { theme } = useTheme();
-  const styles = useStyles();
 
   const asyncClimbs = useAsync(() => {
     return getFilteredClimbs(climbFilters);
@@ -160,5 +161,8 @@ const useStyles = makeStyles((theme, _props: Props) => ({
     color: theme.colors.primary,
     fontSize: 16,
     marginRight: 15,
+  },
+  badge: {
+    borderWidth: 0,
   },
 }));
