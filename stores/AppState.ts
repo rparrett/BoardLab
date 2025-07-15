@@ -29,8 +29,12 @@ export const useAppState = create<AppState>()(
     set => ({
       climbFilters: { angle: 40, search: '' },
       setClimbFilters: filters => set({ climbFilters: filters }),
-      setAngle: angle => set(state => ({ climbFilters: { ...state.climbFilters, angle } })),
-      setSearchText: searchText => set(state => ({ climbFilters: { ...state.climbFilters, search: searchText } })),
+      setAngle: angle =>
+        set(state => ({ climbFilters: { ...state.climbFilters, angle } })),
+      setSearchText: searchText =>
+        set(state => ({
+          climbFilters: { ...state.climbFilters, search: searchText },
+        })),
 
       // Climb creation state
       climbInProgress: new Map<number, number>(),

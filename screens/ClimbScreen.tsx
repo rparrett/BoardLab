@@ -1,11 +1,8 @@
 import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
-import { Text } from '@rn-vui/themed';
-import { StyleSheet, View } from 'react-native';
-import {
-  useDatabase,
-  DbClimb,
-} from '../contexts/DatabaseProvider';
+import { Text, Icon } from '@rn-vui/themed';
+import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native';
+import { useDatabase, DbClimb } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
 import { useLayoutEffect, useMemo, useEffect, useState } from 'react';
 import { IndexedMap } from '../lib/IndexedMap';
@@ -28,7 +25,7 @@ export default function ClimbScreen({ route }: Props) {
   let { uuid } = params;
   const navigation = useNavigation<ClimbsStackNavigationProp>();
   const { getClimb, getFilteredClimbs, ready } = useDatabase();
-  const { climbFilters } = useAppState();
+  const { climbFilters, climbInProgress, setClimbInProgress } = useAppState();
 
   // Cache filtered climbs for fast navigation
   const [climbsCache, setClimbsCache] = useState<IndexedMap<string, DbClimb>>(
@@ -72,15 +69,56 @@ export default function ClimbScreen({ route }: Props) {
     sendToBoard(climbPlacements);
   }, [climbPlacements, sendToBoard]);
 
+  const handleSendToCreate = () => {
+    const copyAndNavigate = () => {
+      setClimbInProgress(climbPlacements);
+      navigation.navigate('Create' as any);
+    };
+
+    // Check if there's already work in progress
+    if (climbInProgress.size > 0) {
+      Alert.alert(
+        'Replace Current Climb?',
+        'You have an unsaved climb in progress. Do you want to replace it with this climb?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Replace',
+            style: 'destructive',
+            onPress: copyAndNavigate,
+          },
+        ],
+      );
+    } else {
+      // No work in progress, proceed directly
+      copyAndNavigate();
+    }
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => <BluetoothHeaderButton />,
+      headerRight: () => (
+        <View style={styles.headerRight}>
+          <TouchableOpacity onPress={handleSendToCreate}>
+            <Icon
+              name="content-copy"
+              type="material"
+              size={24}
+              color="#007AFF"
+            />
+          </TouchableOpacity>
+          <BluetoothHeaderButton />
+        </View>
+      ),
       // We'll be using swipes to navigate to the prev/next item in the filtered
       // climb list. So we need to disable React Navigation's swipe gestures on this
       // screen.
       gestureEnabled: false,
     });
-  }, [navigation]);
+  }, [navigation, handleSendToCreate]);
 
   const handleSwipeLeft = () => {
     const nextUuid = climbsCache.getNextKey(uuid);
@@ -157,4 +195,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   grade: {},
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
 });
