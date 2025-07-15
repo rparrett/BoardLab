@@ -13,6 +13,7 @@ export default function BottomSheetHeader({ title, onClose }: Props) {
   return (
     <View style={styles.headerContainer}>
       <View style={styles.headerContent}>
+        <View style={styles.spacer} />
         <Text style={styles.headerText}>{title}</Text>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <Icon name="close" type="material" size={24} />
@@ -30,10 +31,12 @@ const useStyles = makeStyles(_theme => ({
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     width: '100%',
     paddingHorizontal: 16,
     paddingVertical: 10,
+  },
+  spacer: {
+    width: 32, // Same width as close button (24px icon + 8px padding)
   },
   headerText: {
     fontSize: 17,

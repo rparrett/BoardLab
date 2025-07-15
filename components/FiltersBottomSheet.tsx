@@ -102,7 +102,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.colors.secondarySurface,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    paddingBottom: 40,
+    paddingBottom: 20,
   },
   section: {
     padding: 16,

@@ -108,7 +108,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.colors.secondarySurface,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    paddingBottom: 40,
+    paddingBottom: 20,
   },
   listItemContainer: {
     backgroundColor: theme.colors.secondarySurface,

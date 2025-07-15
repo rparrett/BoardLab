@@ -13,6 +13,7 @@ import StarRating from '../components/StarRating';
 import BoardDisplay from '../components/BoardDisplay';
 import BluetoothBottomSheet from '../components/BluetoothBottomSheet';
 import BluetoothHeaderButton from '../components/BluetoothHeaderButton';
+import ShareBottomSheet from '../components/ShareBottomSheet';
 import { useBleClimbSender } from '../lib/useBleClimbSender';
 import { parseFramesString, type ClimbPlacements } from '../lib/frames-utils';
 
@@ -38,6 +39,7 @@ export default function ClimbScreen({ route }: Props) {
 
   // Keep track of the currently displayed climb (only update when new data is available)
   const [displayedClimb, setDisplayedClimb] = useState<DbClimb | null>(null);
+  const [isShareVisible, setIsShareVisible] = useState(false);
 
   // Update displayed climb when new data becomes available
   useEffect(() => {
@@ -98,6 +100,10 @@ export default function ClimbScreen({ route }: Props) {
     }
   };
 
+  const handleShare = () => {
+    setIsShareVisible(true);
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -110,6 +116,9 @@ export default function ClimbScreen({ route }: Props) {
               color="#007AFF"
             />
           </TouchableOpacity>
+          <TouchableOpacity onPress={handleShare}>
+            <Icon name="share" type="material" size={24} color="#007AFF" />
+          </TouchableOpacity>
           <BluetoothHeaderButton />
         </View>
       ),
@@ -118,7 +127,7 @@ export default function ClimbScreen({ route }: Props) {
       // screen.
       gestureEnabled: false,
     });
-  }, [navigation, handleSendToCreate]);
+  }, [navigation, handleSendToCreate, handleShare]);
 
   const handleSwipeLeft = () => {
     const nextUuid = climbsCache.getNextKey(uuid);
@@ -169,6 +178,11 @@ export default function ClimbScreen({ route }: Props) {
         onSwipeRight={handleSwipeRight}
       />
       <BluetoothBottomSheet />
+      <ShareBottomSheet
+        isVisible={isShareVisible}
+        onBackdropPress={() => setIsShareVisible(false)}
+        climbUuid={uuid}
+      />
     </View>
   );
 }
