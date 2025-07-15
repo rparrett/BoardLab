@@ -21,7 +21,7 @@ export default function ClimbListItem({ item, onPress }: Props) {
       ({ fa_username, setter_username }) =>
         fa_username === setter_username
           ? `Set & FA: ${item.setter_username}`
-          : `Set: ${item.setter_username} FA: ${item.setter_username}`,
+          : `Set: ${item.setter_username} FA: ${item.fa_username}`,
     )
     .otherwise(() => null);
 
