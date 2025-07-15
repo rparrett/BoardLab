@@ -18,8 +18,9 @@ import {
 import { useAppState } from '../stores/AppState';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, useEffect } from 'react';
 import { useHeaderHeight } from '@react-navigation/elements';
+import { useBleClimbSender } from '../lib/useBleClimbSender';
 
 type Props = StaticScreenProps<{
   uuid: string | undefined;
@@ -52,6 +53,13 @@ export default function CreateScreen({}: Props) {
   const asyncRoles = useAsync(() => {
     return getRoles(1);
   }, [ready]);
+
+  const { sendToBoard } = useBleClimbSender();
+
+  // Send climb in progress to board whenever it changes (including empty to clear board)
+  useEffect(() => {
+    sendToBoard(climbInProgress);
+  }, [climbInProgress, sendToBoard]);
 
   // Map role IDs to appropriate icons
   const roleIconMap: Record<number, { iconName: string; iconType: string }> = {

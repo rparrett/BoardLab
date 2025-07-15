@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { BleManager, Device, State } from 'react-native-ble-plx';
 
 const ADVERTISING_SERVICE_UUID = '4488B571-7806-4DF6-BCFF-A2897E4953FF';
+const DATA_SERVICE_UUID = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E';
+const DATA_CHARACTERISTIC_UUID = '6E400002-B5A3-F393-E0A9-E50E24DCCA9E';
 
 interface BluetoothState {
   // State
@@ -26,6 +28,7 @@ interface BluetoothState {
   connectToDevice: (device: Device) => Promise<void>;
   disconnectDevice: () => Promise<void>;
   handleBluetoothPress: () => void;
+  writeToCharacteristic: (data: Uint8Array) => Promise<boolean>;
 
   // Lifecycle
   initializeBluetooth: () => void;
@@ -157,6 +160,50 @@ export const useBluetoothState = create<BluetoothState>((set, get) => {
         } catch (error) {
           console.error('Disconnect error:', error);
         }
+      }
+    },
+
+    writeToCharacteristic: async (data: Uint8Array) => {
+      const { connectedDevice } = get();
+
+      if (!connectedDevice) {
+        console.error('No connected device for BLE write');
+        return false;
+      }
+
+      try {
+        // Discover services if not already done
+        await connectedDevice.discoverAllServicesAndCharacteristics();
+
+        // Convert Uint8Array to base64 string (required by react-native-ble-plx)
+        const base64Data = btoa(String.fromCharCode(...data));
+
+        console.log(`BLE: Writing to characteristic (${data.length} bytes):`);
+
+        // Log the data for debugging
+        data.forEach((byte, index) => {
+          const ascii =
+            byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : '·';
+          console.log(
+            `BLE: [${index.toString().padStart(3)}]: 0x${byte
+              .toString(16)
+              .padStart(2, '0')
+              .toUpperCase()} (${byte.toString().padStart(3)}) ${ascii}`,
+          );
+        });
+
+        // Write to characteristic
+        await connectedDevice.writeCharacteristicWithResponseForService(
+          DATA_SERVICE_UUID,
+          DATA_CHARACTERISTIC_UUID,
+          base64Data,
+        );
+
+        console.log('BLE: Successfully wrote data to characteristic');
+        return true;
+      } catch (error) {
+        console.error('BLE write error:', error);
+        return false;
       }
     },
 

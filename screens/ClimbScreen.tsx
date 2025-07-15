@@ -3,13 +3,15 @@ import { Text } from '@rneui/themed';
 import { StyleSheet, View } from 'react-native';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useMemo, useEffect } from 'react';
 import Loading from '../components/Loading';
 import Error from '../components/Error';
 import StarRating from '../components/StarRating';
 import BoardDisplay from '../components/BoardDisplay';
 import BluetoothBottomSheet from '../components/BluetoothBottomSheet';
 import BluetoothHeaderButton from '../components/BluetoothHeaderButton';
+import { useBleClimbSender } from '../lib/useBleClimbSender';
+import { parseFramesString, type ClimbPlacements } from '../lib/frames-utils';
 
 type Props = StaticScreenProps<{
   uuid: string;
@@ -20,10 +22,21 @@ export default function ClimbScreen({ route }: Props) {
   let { uuid } = params;
   const navigation = useNavigation();
   const { getClimb, ready } = useDatabase();
-
   const asyncClimb = useAsync(() => {
     return getClimb(uuid);
   }, [uuid, ready]);
+  const { sendToBoard } = useBleClimbSender();
+
+  // Parse frames and set up BLE sender
+  const climbPlacements = useMemo((): ClimbPlacements => {
+    if (!asyncClimb.result?.frames) return new Map();
+    return parseFramesString(asyncClimb.result.frames);
+  }, [asyncClimb.result?.frames]);
+
+  // Send climb data when it loads (including empty climbs to clear the board)
+  useEffect(() => {
+    sendToBoard(climbPlacements);
+  }, [climbPlacements, sendToBoard]);
 
   // Header button
   useLayoutEffect(() => {
@@ -47,24 +60,6 @@ export default function ClimbScreen({ route }: Props) {
 
   const climb = asyncClimb.result;
 
-  // Parse the frames string to get position -> role mapping
-  const parseFrames = (framesString: string): Map<number, number> => {
-    const placementRoleMap = new Map<number, number>();
-
-    const regex = /p(\d+)r(\d+)/g;
-    let match;
-
-    while ((match = regex.exec(framesString)) !== null) {
-      const placementId = parseInt(match[1], 10);
-      const roleId = parseInt(match[2], 10);
-      placementRoleMap.set(placementId, roleId);
-    }
-
-    return placementRoleMap;
-  };
-
-  const placements = parseFrames(climb.frames);
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -80,7 +75,7 @@ export default function ClimbScreen({ route }: Props) {
         </View>
       </View>
 
-      <BoardDisplay placements={placements} />
+      <BoardDisplay placements={climbPlacements} />
       <BluetoothBottomSheet />
     </View>
   );
