@@ -3,7 +3,14 @@ import { FlatList, TouchableOpacity, View } from 'react-native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
 import { DbClimb, useDatabase } from '../contexts/DatabaseProvider';
 import { useLayoutEffect, useState } from 'react';
-import { Text, SearchBar, Icon, useTheme, makeStyles } from '@rn-vui/themed';
+import {
+  Text,
+  SearchBar,
+  Icon,
+  useTheme,
+  makeStyles,
+  withBadge,
+} from '@rn-vui/themed';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
 import FiltersBottomSheet from '../components/FiltersBottomSheet';
 import ClimbListItem from '../components/ClimbListItem';
@@ -18,6 +25,15 @@ export default function ClimbListScreen({}: Props) {
   const navigation = useNavigation<ClimbsStackNavigationProp>();
   const { getFilteredClimbs, ready } = useDatabase();
   const { climbFilters, setAngle, setSearchText } = useAppState();
+
+  const activeFilterCount = climbFilters.grades?.length > 0 ? 1 : 0;
+
+  const BadgedIcon = withBadge(activeFilterCount, {
+    hidden: activeFilterCount === 0,
+    status: 'primary',
+    top: -2,
+    right: -2,
+  })(Icon);
   const [isAngleSelectVisible, setIsAngleSelectVisible] = useState(false);
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
 
@@ -39,8 +55,6 @@ export default function ClimbListScreen({}: Props) {
       ),
     });
   }, [navigation, climbFilters.angle, styles]);
-
-  console.log(asyncClimbs.result);
 
   const renderItem = ({ item }: { item: DbClimb }) => {
     return (
@@ -87,7 +101,7 @@ export default function ClimbListScreen({}: Props) {
           style={styles.filterButton}
           onPress={() => setIsFiltersVisible(true)}
         >
-          <Icon
+          <BadgedIcon
             size={24}
             type="materialicons"
             name="filter-list"
