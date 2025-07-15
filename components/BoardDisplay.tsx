@@ -45,8 +45,6 @@ export default function BoardDisplay({
   const [containerDimensions, setContainerDimensions] = useState(
     cachedContainerDimensions || { width: 0, height: 0 },
   );
-  const [zoomableRef, setZoomableRef] =
-    useState<ReactNativeZoomableView | null>(null);
 
   const [isLongPressing, setIsLongPressing] = useState(false);
   const [currentZoomLevel, setCurrentZoomLevel] = useState(1);
@@ -287,7 +285,6 @@ export default function BoardDisplay({
     >
       {containerDimensions.width > 0 && (
         <ReactNativeZoomableView
-          ref={r => setZoomableRef(r)}
           maxZoom={4}
           minZoom={1}
           zoomStep={1.5}
