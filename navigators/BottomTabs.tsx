@@ -27,7 +27,7 @@ const BottomTabs = createBottomTabNavigator({
       screen: CreateScreen,
       options: {
         tabBarIcon: ({ color, size }) => (
-          <Icon name="add-box" type="material" color={color} size={size} />
+          <Icon name="create" type="material" color={color} size={size} />
         ),
       },
     },
