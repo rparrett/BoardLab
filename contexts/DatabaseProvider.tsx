@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { open, QuickSQLiteConnection } from 'react-native-quick-sqlite';
 import RNFS from 'react-native-fs';
+import { IndexedMap } from '../lib/IndexedMap';
 
 export type DbClimb = {
   uuid: string;
@@ -47,11 +48,18 @@ export type Role = {
   screenColor: string;
 };
 
+export type ClimbFilters = {
+  angle: number;
+  search: string;
+};
+
 type DatabaseContextType = {
   db: QuickSQLiteConnection | null;
   ready: boolean;
   error: string | null;
-  getFilteredClimbs: (angle: number, search: string) => Promise<DbClimb[]>;
+  getFilteredClimbs: (
+    filters: ClimbFilters,
+  ) => Promise<IndexedMap<string, DbClimb>>;
   getClimb: (uuid: string) => Promise<DbClimb | null>;
   getPlacementData: () => Promise<Map<number, PlacementData>>;
   getRoles: (productId: number) => Promise<Map<number, Role>>;
@@ -95,15 +103,16 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
   };
 
   const getFilteredClimbs = async (
-    angle: number,
-    search: string,
-  ): Promise<DbClimb[]> => {
+    filters: ClimbFilters,
+  ): Promise<IndexedMap<string, DbClimb>> => {
     if (!db) {
       console.warn('Attempting to query with no database connection.');
-      return [];
+      return new IndexedMap<string, DbClimb>([], climb => climb.uuid);
     }
 
-    let climbs: DbClimb[] = [];
+    console.log('getFilteredClimbs');
+
+    const climbs: DbClimb[] = [];
 
     let { rows } = await db.executeAsync(
       `
@@ -128,16 +137,17 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       ORDER BY climb_stats.ascensionist_count DESC
       LIMIT 100
       `,
-      [angle, `%${search}%`],
+      [filters.angle, `%${filters.search}%`],
     );
 
     if (rows) {
       for (let i = 0; i < rows.length; i++) {
-        climbs.push(rows.item(i));
+        const climb = rows.item(i);
+        climbs.push(climb);
       }
     }
 
-    return climbs;
+    return new IndexedMap(climbs, climb => climb.uuid);
   };
 
   const getClimb = async (uuid: string): Promise<DbClimb | null> => {

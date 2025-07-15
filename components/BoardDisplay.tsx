@@ -4,6 +4,7 @@ import { Icon } from '@rneui/themed';
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
+import { useAppState } from '../stores/AppState';
 
 export interface PlacementPressEvent {
   originalEvent: any;
@@ -20,23 +21,35 @@ interface BoardDisplayProps {
   onPress?: (event: PlacementPressEvent) => void;
   /** Called when a placement is long pressed */
   onLongPress?: (event: PlacementPressEvent) => void;
+  /** Called when user swipes left (only when zoom level is 1) */
+  onSwipeLeft?: () => void;
+  /** Called when user swipes right (only when zoom level is 1) */
+  onSwipeRight?: () => void;
 }
 
 export default function BoardDisplay({
   placements,
   onPress,
   onLongPress,
+  onSwipeLeft,
+  onSwipeRight,
 }: BoardDisplayProps) {
   const { getPlacementData, getRoles, ready } = useDatabase();
+  const { cachedContainerDimensions, setCachedContainerDimensions } =
+    useAppState();
 
-  const [containerDimensions, setContainerDimensions] = useState({
-    width: 0,
-    height: 0,
-  });
+  // Cache container dimensions to prevent blank flashes during navigation.
+  // Without caching, the component would start with {0,0} dimensions on each
+  // render until onLayout fires, causing a brief visual flash when swiping
+  // between climbs.
+  const [containerDimensions, setContainerDimensions] = useState(
+    cachedContainerDimensions || { width: 0, height: 0 },
+  );
   const [zoomableRef, setZoomableRef] =
     useState<ReactNativeZoomableView | null>(null);
 
   const [isLongPressing, setIsLongPressing] = useState(false);
+  const [currentZoomLevel, setCurrentZoomLevel] = useState(1);
 
   const asyncPlacementData = useAsync(() => {
     return getPlacementData();
@@ -144,8 +157,8 @@ export default function BoardDisplay({
     let diffX = viewPlacementX - tapX;
     let diffY = viewPlacementY - tapY;
 
-    let scaledDiffX = diffX * zoomableRef?.zoomLevel ?? 1.0;
-    let scaledDiffY = diffY * zoomableRef?.zoomLevel ?? 1.0;
+    let scaledDiffX = diffX * currentZoomLevel;
+    let scaledDiffY = diffY * currentZoomLevel;
 
     let placementScreenX = tapScreenX + scaledDiffX;
     let placementScreenY = tapScreenY + scaledDiffY;
@@ -235,12 +248,41 @@ export default function BoardDisplay({
     }
   };
 
+  // Swipe detection handlers for ReactNativeZoomableView
+  const handlePanResponderEnd = (evt: any, gestureState: any) => {
+    // Only process swipes when at zoom level 1
+    if (currentZoomLevel !== 1) {
+      return;
+    }
+
+    const { dx, vx, dy } = gestureState;
+
+    // Detect horizontal swipe with sufficient distance and velocity
+    if (
+      Math.abs(dx) > 50 &&
+      Math.abs(vx) > 0.3 &&
+      Math.abs(dx) > Math.abs(dy)
+    ) {
+      if (dx > 0 && onSwipeRight) {
+        onSwipeRight();
+      } else if (dx < 0 && onSwipeLeft) {
+        onSwipeLeft();
+      }
+    }
+  };
+
+  const handleStartShouldSetPanResponder = (_evt: any, _gestureState: any) => {
+    return currentZoomLevel === 1;
+  };
+
   return (
     <View
       style={styles.imageZoomContainer}
       onLayout={event => {
         const { width, height } = event.nativeEvent.layout;
-        setContainerDimensions({ width, height });
+        const dimensions = { width, height };
+        setContainerDimensions(dimensions);
+        setCachedContainerDimensions(dimensions);
       }}
     >
       {containerDimensions.width > 0 && (
@@ -255,6 +297,11 @@ export default function BoardDisplay({
           visualTouchFeedbackEnabled={false}
           onSingleTap={handlePress}
           onLongPress={handleLongPress}
+          onStartShouldSetPanResponder={handleStartShouldSetPanResponder}
+          onPanResponderEnd={handlePanResponderEnd}
+          onZoomEnd={(event, gestureState, zoomableViewEventObject) => {
+            setCurrentZoomLevel(zoomableViewEventObject.zoomLevel);
+          }}
         >
           <View style={styles.imageContainer}>
             <Image

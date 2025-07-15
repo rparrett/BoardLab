@@ -1,7 +1,10 @@
 import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
-import { DbClimb, useDatabase } from '../contexts/DatabaseProvider';
+import {
+  DbClimb,
+  useDatabase,
+} from '../contexts/DatabaseProvider';
 import { useLayoutEffect, useState } from 'react';
 import { Text, SearchBar, Icon, useTheme, makeStyles } from '@rneui/themed';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
@@ -16,26 +19,25 @@ type Props = StaticScreenProps<{}>;
 export default function ClimbListScreen({}: Props) {
   const navigation = useNavigation<ClimbsStackNavigationProp>();
   const { getFilteredClimbs, ready } = useDatabase();
-  const { selectedAngle, setSelectedAngle } = useAppState();
+  const { climbFilters, setAngle, setSearchText } = useAppState();
   const [isVisible, setIsVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
 
   const { theme } = useTheme();
   const styles = useStyles();
 
   const asyncClimbs = useAsync(() => {
-    return getFilteredClimbs(selectedAngle, searchText);
-  }, [selectedAngle, ready, searchText]);
+    return getFilteredClimbs(climbFilters);
+  }, [climbFilters, ready]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={() => setIsVisible(true)}>
-          <Text style={styles.angleSelectButtonText}>{selectedAngle}°</Text>
+          <Text style={styles.angleSelectButtonText}>{climbFilters.angle}°</Text>
         </TouchableOpacity>
       ),
     });
-  }, [navigation, selectedAngle, styles]);
+  }, [navigation, climbFilters.angle, styles]);
 
   console.log(asyncClimbs.result);
 
@@ -43,13 +45,15 @@ export default function ClimbListScreen({}: Props) {
     return (
       <ClimbListItem
         item={item}
-        onPress={() => navigation.navigate('Climb', { uuid: item.uuid })}
+        onPress={() =>
+          navigation.navigate('Climb', { uuid: item.uuid })
+        }
       />
     );
   };
 
   const handleSelect = (option: { label: string; value: number }) => {
-    setSelectedAngle(option.value);
+    setAngle(option.value);
     setIsVisible(false);
   };
 
@@ -59,7 +63,7 @@ export default function ClimbListScreen({}: Props) {
         <SearchBar
           key="search-bar"
           placeholder="Search"
-          value={searchText}
+          value={climbFilters.search}
           onChangeText={setSearchText}
           platform="ios"
           showCancel={false}
@@ -93,14 +97,14 @@ export default function ClimbListScreen({}: Props) {
       {asyncClimbs.error && <Error error={asyncClimbs.error} />}
       {!asyncClimbs.loading && !asyncClimbs.error && (
         <FlatList
-          data={asyncClimbs.result || []}
+          data={asyncClimbs.result?.toArray() || []}
           renderItem={renderItem}
           keyExtractor={item => item.uuid}
         />
       )}
       <AngleSelectBottomSheet
         isVisible={isVisible}
-        selectedAngle={selectedAngle}
+        selectedAngle={climbFilters.angle}
         onSelect={handleSelect}
         onBackdropPress={() => setIsVisible(false)}
       />

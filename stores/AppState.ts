@@ -1,10 +1,13 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ClimbFilters } from '../contexts/DatabaseProvider';
 
 interface AppState {
-  selectedAngle: number;
-  setSelectedAngle: (angle: number) => void;
+  climbFilters: ClimbFilters;
+  setClimbFilters: (filters: ClimbFilters) => void;
+  setAngle: (angle: number) => void;
+  setSearchText: (searchText: string) => void;
 
   // Climb creation state
   climbInProgress: Map<number, number>; // placement ID -> role ID
@@ -12,13 +15,22 @@ interface AppState {
   updatePlacement: (placementId: number, roleId: number) => void;
   removePlacement: (placementId: number) => void;
   clearClimbInProgress: () => void;
+
+  // Cached container dimensions for BoardDisplay
+  cachedContainerDimensions: { width: number; height: number } | null;
+  setCachedContainerDimensions: (dimensions: {
+    width: number;
+    height: number;
+  }) => void;
 }
 
 export const useAppState = create<AppState>()(
   persist(
     set => ({
-      selectedAngle: 40,
-      setSelectedAngle: angle => set({ selectedAngle: angle }),
+      climbFilters: { angle: 40, search: '' },
+      setClimbFilters: filters => set({ climbFilters: filters }),
+      setAngle: angle => set(state => ({ climbFilters: { ...state.climbFilters, angle } })),
+      setSearchText: searchText => set(state => ({ climbFilters: { ...state.climbFilters, search: searchText } })),
 
       // Climb creation state
       climbInProgress: new Map<number, number>(),
@@ -36,12 +48,17 @@ export const useAppState = create<AppState>()(
           return { climbInProgress: newMap };
         }),
       clearClimbInProgress: () => set({ climbInProgress: new Map() }),
+
+      // Cached container dimensions for BoardDisplay
+      cachedContainerDimensions: null,
+      setCachedContainerDimensions: dimensions =>
+        set({ cachedContainerDimensions: dimensions }),
     }),
     {
       name: 'app-storage',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: state => ({
-        selectedAngle: state.selectedAngle,
+        climbFilters: state.climbFilters,
         climbInProgress: Array.from(state.climbInProgress.entries()),
       }),
       onRehydrateStorage: () => state => {

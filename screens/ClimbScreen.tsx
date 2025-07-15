@@ -1,9 +1,15 @@
 import { StaticScreenProps, useNavigation } from '@react-navigation/native';
+import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
 import { Text } from '@rneui/themed';
 import { StyleSheet, View } from 'react-native';
-import { useDatabase } from '../contexts/DatabaseProvider';
+import {
+  useDatabase,
+  DbClimb,
+} from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
-import { useLayoutEffect, useMemo, useEffect } from 'react';
+import { useLayoutEffect, useMemo, useEffect, useState } from 'react';
+import { IndexedMap } from '../lib/IndexedMap';
+import { useAppState } from '../stores/AppState';
 import Loading from '../components/Loading';
 import Error from '../components/Error';
 import StarRating from '../components/StarRating';
@@ -20,33 +26,77 @@ type Props = StaticScreenProps<{
 export default function ClimbScreen({ route }: Props) {
   let { params } = route;
   let { uuid } = params;
-  const navigation = useNavigation();
-  const { getClimb, ready } = useDatabase();
+  const navigation = useNavigation<ClimbsStackNavigationProp>();
+  const { getClimb, getFilteredClimbs, ready } = useDatabase();
+  const { climbFilters } = useAppState();
+
+  // Cache filtered climbs for fast navigation
+  const [climbsCache, setClimbsCache] = useState<IndexedMap<string, DbClimb>>(
+    new IndexedMap<string, DbClimb>([], climb => climb.uuid),
+  );
   const asyncClimb = useAsync(() => {
     return getClimb(uuid);
   }, [uuid, ready]);
   const { sendToBoard } = useBleClimbSender();
 
+  // Keep track of the currently displayed climb (only update when new data is available)
+  const [displayedClimb, setDisplayedClimb] = useState<DbClimb | null>(null);
+
+  // Update displayed climb when new data becomes available
+  useEffect(() => {
+    if (asyncClimb.result) {
+      setDisplayedClimb(asyncClimb.result);
+    }
+  }, [asyncClimb.result]);
+
   // Parse frames and set up BLE sender
   const climbPlacements = useMemo((): ClimbPlacements => {
-    if (!asyncClimb.result?.frames) return new Map();
-    return parseFramesString(asyncClimb.result.frames);
-  }, [asyncClimb.result?.frames]);
+    if (!displayedClimb?.frames) return new Map();
+    return parseFramesString(displayedClimb.frames);
+  }, [displayedClimb?.frames]);
+
+  // Load and cache filtered climbs for navigation
+  useEffect(() => {
+    const loadClimbsList = async () => {
+      if (!ready) return;
+
+      const filteredClimbs = await getFilteredClimbs(climbFilters);
+      setClimbsCache(filteredClimbs);
+    };
+
+    loadClimbsList();
+  }, [climbFilters, ready, getFilteredClimbs]); // Reload when filters or ready changes
 
   // Send climb data when it loads (including empty climbs to clear the board)
   useEffect(() => {
     sendToBoard(climbPlacements);
   }, [climbPlacements, sendToBoard]);
 
-  // Header button
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => <BluetoothHeaderButton />,
+      // We'll be using swipes to navigate to the prev/next item in the filtered
+      // climb list. So we need to disable React Navigation's swipe gestures on this
+      // screen.
+      gestureEnabled: false,
     });
   }, [navigation]);
 
-  // Early returns after all hooks
-  if (asyncClimb.loading) {
+  const handleSwipeLeft = () => {
+    const nextUuid = climbsCache.getNextKey(uuid);
+    if (nextUuid) {
+      navigation.navigate('Climb', { uuid: nextUuid });
+    }
+  };
+
+  const handleSwipeRight = () => {
+    const previousUuid = climbsCache.getPreviousKey(uuid);
+    if (previousUuid) {
+      navigation.navigate('Climb', { uuid: previousUuid });
+    }
+  };
+
+  if (asyncClimb.loading && !displayedClimb) {
     return <Loading text="Loading climb..." />;
   }
 
@@ -54,11 +104,11 @@ export default function ClimbScreen({ route }: Props) {
     return <Error error={asyncClimb.error} />;
   }
 
-  if (!asyncClimb.result) {
+  if (!displayedClimb) {
     return <Error error="Climb not found" />;
   }
 
-  const climb = asyncClimb.result;
+  const climb = displayedClimb;
 
   return (
     <View style={styles.container}>
@@ -75,7 +125,11 @@ export default function ClimbScreen({ route }: Props) {
         </View>
       </View>
 
-      <BoardDisplay placements={climbPlacements} />
+      <BoardDisplay
+        placements={climbPlacements}
+        onSwipeLeft={handleSwipeLeft}
+        onSwipeRight={handleSwipeRight}
+      />
       <BluetoothBottomSheet />
     </View>
   );
