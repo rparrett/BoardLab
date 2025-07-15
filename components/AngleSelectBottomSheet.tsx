@@ -1,5 +1,5 @@
 import React from 'react';
-import { BottomSheet, ListItem, makeStyles } from '@rneui/themed';
+import { BottomSheet, ListItem, makeStyles } from '@rn-vui/themed';
 import BottomSheetHeader from './BottomSheetHeader';
 
 type AngleOption = {

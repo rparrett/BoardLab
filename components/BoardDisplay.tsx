@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
-import { Icon } from '@rneui/themed';
+import { Icon } from '@rn-vui/themed';
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';

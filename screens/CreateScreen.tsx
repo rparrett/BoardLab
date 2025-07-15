@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   useColorScheme,
 } from 'react-native';
-import { Icon } from '@rneui/themed';
+import { Icon } from '@rn-vui/themed';
 import BoardDisplay, { PlacementPressEvent } from '../components/BoardDisplay';
 import BluetoothHeaderButton from '../components/BluetoothHeaderButton';
 import BluetoothBottomSheet from '../components/BluetoothBottomSheet';

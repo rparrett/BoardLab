@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { TouchableOpacity, StyleSheet, Animated } from 'react-native';
-import { Icon } from '@rneui/themed';
+import { Icon } from '@rn-vui/themed';
 
 interface RadialMenuItemProps {
   onPress: () => void;

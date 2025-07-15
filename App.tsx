@@ -7,7 +7,7 @@ import React, { useEffect } from 'react';
 
 import BottomTabs, { BottomTabsParamList } from './navigators/BottomTabs';
 import { useColorScheme } from 'react-native';
-import { createTheme, ThemeProvider, useTheme } from '@rneui/themed';
+import { createTheme, ThemeProvider, useTheme } from '@rn-vui/themed';
 import { DatabaseProvider } from './contexts/DatabaseProvider';
 import { useBluetoothState } from './stores/BluetoothState';
 

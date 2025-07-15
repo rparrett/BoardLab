@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Icon, useTheme } from '@rneui/themed';
+import { Icon, useTheme } from '@rn-vui/themed';
 
 type Props = {
   rating: number;

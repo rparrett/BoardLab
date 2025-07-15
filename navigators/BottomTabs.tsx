@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SettingsScreen from '../screens/SettingsScreen';
 import ClimbsStack from './ClimbsStack';
 import { StaticParamList } from '@react-navigation/native';
-import { Icon } from '@rneui/themed';
+import { Icon } from '@rn-vui/themed';
 import CreateScreen from '../screens/CreateScreen';
 
 export type BottomTabsParamList = StaticParamList<typeof BottomTabs>;

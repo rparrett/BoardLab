@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
-import { Icon } from '@rneui/themed';
+import { Icon } from '@rn-vui/themed';
 import { useBluetoothState } from '../stores/BluetoothState';
 
 export default function BluetoothHeaderButton() {

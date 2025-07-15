@@ -6,7 +6,7 @@ import {
   useDatabase,
 } from '../contexts/DatabaseProvider';
 import { useLayoutEffect, useState } from 'react';
-import { Text, SearchBar, Icon, useTheme, makeStyles } from '@rneui/themed';
+import { Text, SearchBar, Icon, useTheme, makeStyles } from '@rn-vui/themed';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
 import ClimbListItem from '../components/ClimbListItem';
 import Loading from '../components/Loading';

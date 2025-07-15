@@ -1,6 +1,6 @@
-import '@rneui/themed';
+import '@rn-vui/themed';
 
-declare module '@rneui/themed' {
+declare module '@rn-vui/themed' {
   export interface Colors {
     secondarySurface: string;
     star: string;

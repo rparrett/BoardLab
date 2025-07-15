@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, useTheme } from '@rneui/themed';
-import { Icon } from '@rneui/themed';
+import { Text, useTheme } from '@rn-vui/themed';
+import { Icon } from '@rn-vui/themed';
 
 type Props = {
   error?: Error | string;

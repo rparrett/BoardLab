@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, useTheme } from '@rneui/themed';
+import { Text, useTheme } from '@rn-vui/themed';
 import { ActivityIndicator } from 'react-native';
 
 type Props = {

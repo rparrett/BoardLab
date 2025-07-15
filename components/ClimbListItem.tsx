@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableHighlight, View, StyleSheet, Platform } from 'react-native';
-import { makeStyles, Text, useTheme } from '@rneui/themed';
+import { makeStyles, Text, useTheme } from '@rn-vui/themed';
 import { match, P } from 'ts-pattern';
 import StarRating from './StarRating';
 import { DbClimb } from '../contexts/DatabaseProvider';

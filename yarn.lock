@@ -1803,22 +1803,27 @@
     "@react-navigation/elements" "^2.5.2"
     color "^4.2.3"
 
-"@rneui/base@^4.0.0-rc.8":
-  version "4.0.0-rc.8"
-  resolved "https://registry.npmjs.org/@rneui/base/-/base-4.0.0-rc.8.tgz"
-  integrity sha512-teJ6bUki+TQ+r+abefEWYb2wRUaMgRhp1oxtKa84UfDqTiCF0ItyJ0L8FhMb6AAkTOkWC34301T7j3H4df6ueA==
+"@rn-vui/base@^5.1.8":
+  version "5.1.8"
+  resolved "https://registry.yarnpkg.com/@rn-vui/base/-/base-5.1.8.tgz#813e638764a6804eaae1a1ba6dc9613b058b3fd7"
+  integrity sha512-wuTrd6hYzDleSutjgD5aCkIlR6PvxH7jNNvF8CickGub4vLqAXGd3ZsFvXHgq+oY/ysllmHqAC7h1Qw7/JW+GA==
   dependencies:
+    "@rn-vui/ratings" "^0.5.0"
     "@types/react-native-vector-icons" "^6.4.10"
     color "^3.2.1"
     deepmerge "^4.2.2"
     hoist-non-react-statics "^3.3.2"
-    react-native-ratings "^8.1.0"
     react-native-size-matters "^0.4.0"
 
-"@rneui/themed@^4.0.0-rc.8":
-  version "4.0.0-rc.8"
-  resolved "https://registry.npmjs.org/@rneui/themed/-/themed-4.0.0-rc.8.tgz"
-  integrity sha512-8L/XOrL9OK/r+/iBLvx63TbIdZOXF8SIjN9eArMYm6kRbMr8m4BitXllDN8nBhBsSPNYvL6EAgjk+i2MfY4sBA==
+"@rn-vui/ratings@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@rn-vui/ratings/-/ratings-0.5.0.tgz#6fe805f5d38cc9b897ce738447403936e5dfb6b0"
+  integrity sha512-hEZyIQLjQbtUYj8MZ6a0+88kJCFlOwLSGFJc56R/z8PR3RCmRWyU8ml6i1xoh+9WJz0ZbZ/wBckQ1lI8T/cmGQ==
+
+"@rn-vui/themed@^5.1.8":
+  version "5.1.8"
+  resolved "https://registry.yarnpkg.com/@rn-vui/themed/-/themed-5.1.8.tgz#f1555beb5cb9099aab8dd26cef8508fa06f3c7d8"
+  integrity sha512-nnGKLi8tvaQAOziPlWd+Dj6QdI1UJdCCYhHq6f/Lpfa6P0TaP7gx5iFy6zEq6loKdzcSBLVPpPAmv8FtvT+ktA==
 
 "@sideway/address@^4.1.5":
   version "4.1.5"
@@ -4899,7 +4904,7 @@ lodash.throttle@^4.1.1:
   resolved "https://registry.npmjs.org/lodash.throttle/-/lodash.throttle-4.1.1.tgz"
   integrity sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==
 
-lodash@^4.17.15, lodash@^4.17.21:
+lodash@^4.17.21:
   version "4.17.21"
   resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -5769,13 +5774,6 @@ react-native-quick-sqlite@8:
   integrity sha512-gUW00ic8yM347Uz68bq0lQLKKWqu+4g2j2kIvjif/IySAoQjXj9p6RDuezfZPQEmfslAJQio8Xn1ORMkeZ4b1Q==
   dependencies:
     typeorm "^0.3.20"
-
-react-native-ratings@^8.1.0:
-  version "8.1.0"
-  resolved "https://registry.npmjs.org/react-native-ratings/-/react-native-ratings-8.1.0.tgz"
-  integrity sha512-+QOJ4G3NjVkI1D+tk4EGx1dCvVfbD2nQdkrj9cXrcAoEiwmbep4z4bZbCKmWMpQ5h2dqbxABU8/eBnbDmvAc3g==
-  dependencies:
-    lodash "^4.17.15"
 
 react-native-safe-area-context@^5.5.1:
   version "5.5.1"

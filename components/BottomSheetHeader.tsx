@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import { Text, Divider, makeStyles, Icon } from '@rneui/themed';
+import { Text, Divider, makeStyles, Icon } from '@rn-vui/themed';
 
 type Props = {
   title: string;

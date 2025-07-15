@@ -1,6 +1,6 @@
 import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
-import { Text } from '@rneui/themed';
+import { Text } from '@rn-vui/themed';
 import { StyleSheet, View } from 'react-native';
 import {
   useDatabase,
