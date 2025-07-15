@@ -42,7 +42,7 @@ export const useBluetoothState = create<BluetoothState>((set, get) => {
   return {
     // State
     bleManager,
-    bluetoothState: 'Unknown',
+    bluetoothState: State.Unknown,
     isScanning: false,
     devices: [],
     connectedDevice: null,
