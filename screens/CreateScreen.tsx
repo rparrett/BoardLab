@@ -94,13 +94,13 @@ export default function CreateScreen({}: Props) {
     navigation.setOptions({
       headerRight: () => (
         <View style={styles.headerButtons}>
-          <BluetoothHeaderButton />
           <TouchableOpacity
             onPress={clearClimbInProgress}
             style={styles.clearButton}
           >
             <Icon name="eraser" type="material-community" size={24} />
           </TouchableOpacity>
+          <BluetoothHeaderButton />
         </View>
       ),
     });
