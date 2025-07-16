@@ -183,22 +183,12 @@ export default function CreateScreen({}: Props) {
             selectedPlacementId !== null &&
             climbInProgress.has(selectedPlacementId)
               ? handleRemovePlacement
-              : () => {} // No-op when disabled
+              : closeRadialMenu
           }
           iconName="delete"
           iconType="materialicons"
-          iconColor={
-            selectedPlacementId !== null &&
-            climbInProgress.has(selectedPlacementId)
-              ? '#fff'
-              : '#999'
-          }
-          backgroundColor={
-            selectedPlacementId !== null &&
-            climbInProgress.has(selectedPlacementId)
-              ? '#999'
-              : '#666'
-          }
+          iconColor="#fff"
+          backgroundColor="#999"
         />
         {getFilteredRoles().map(role => {
           const roleIcon = roleIconMap[role.id] || {
