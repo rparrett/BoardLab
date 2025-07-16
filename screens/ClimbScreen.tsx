@@ -1,7 +1,7 @@
 import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
-import { Text, Icon, makeStyles } from '@rn-vui/themed';
-import { View, TouchableOpacity, Alert } from 'react-native';
+import { Text, makeStyles } from '@rn-vui/themed';
+import { View, Alert } from 'react-native';
 import { useDatabase, DbClimb } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
 import { useLayoutEffect, useMemo, useEffect, useState } from 'react';
@@ -12,9 +12,9 @@ import Error from '../components/Error';
 import StarRating from '../components/StarRating';
 import BoardDisplay from '../components/BoardDisplay';
 import BluetoothBottomSheet from '../components/BluetoothBottomSheet';
-import BluetoothHeaderButton from '../components/BluetoothHeaderButton';
 import ShareBottomSheet from '../components/ShareBottomSheet';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
+import ClimbScreenHeaderRight from '../components/ClimbScreenHeaderRight';
 import { useBleClimbSender } from '../lib/useBleClimbSender';
 import { parseFramesString, type ClimbPlacements } from '../lib/frames-utils';
 
@@ -117,25 +117,12 @@ export default function ClimbScreen({ route }: Props) {
     navigation.setOptions({
       title: '',
       headerRight: () => (
-        <View style={styles.headerRight}>
-          <TouchableOpacity onPress={() => setIsAngleSelectVisible(true)}>
-            <Text style={styles.angleSelectButtonText}>
-              {climbFilters.angle}°
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleSendToCreate}>
-            <Icon
-              name="content-copy"
-              type="material"
-              size={24}
-              color="#007AFF"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleShare}>
-            <Icon name="share" type="material" size={24} color="#007AFF" />
-          </TouchableOpacity>
-          <BluetoothHeaderButton />
-        </View>
+        <ClimbScreenHeaderRight
+          angle={climbFilters.angle}
+          onAnglePress={() => setIsAngleSelectVisible(true)}
+          onCopyPress={handleSendToCreate}
+          onSharePress={handleShare}
+        />
       ),
       // We'll be using swipes to navigate to the prev/next item in the filtered
       // climb list. So we need to disable React Navigation's swipe gestures on this
@@ -208,7 +195,7 @@ export default function ClimbScreen({ route }: Props) {
   );
 }
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(_theme => ({
   container: {
     flex: 1,
   },
@@ -230,13 +217,4 @@ const useStyles = makeStyles(theme => ({
     gap: 4,
   },
   grade: {},
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  angleSelectButtonText: {
-    color: theme.colors.primary,
-    fontSize: 16,
-  },
 }));

@@ -2,13 +2,11 @@ import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import {
   StyleSheet,
   View,
-  TouchableOpacity,
   useColorScheme,
 } from 'react-native';
-import { Icon } from '@rn-vui/themed';
 import BoardDisplay, { PlacementPressEvent } from '../components/BoardDisplay';
-import BluetoothHeaderButton from '../components/BluetoothHeaderButton';
 import BluetoothBottomSheet from '../components/BluetoothBottomSheet';
+import CreateScreenHeaderRight from '../components/CreateScreenHeaderRight';
 import {
   RadialMenu,
   RadialMenuCenter,
@@ -93,12 +91,7 @@ export default function CreateScreen({}: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <View style={styles.headerButtons}>
-          <TouchableOpacity onPress={clearClimbInProgress}>
-            <Icon name="eraser" type="material-community" size={24} />
-          </TouchableOpacity>
-          <BluetoothHeaderButton />
-        </View>
+        <CreateScreenHeaderRight onErasePress={clearClimbInProgress} />
       ),
     });
   }, [navigation, clearClimbInProgress]);
@@ -211,10 +204,5 @@ export default function CreateScreen({}: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  headerButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
   },
 });

@@ -4,7 +4,6 @@ import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
 import { DbClimb, useDatabase } from '../contexts/DatabaseProvider';
 import { useLayoutEffect, useState } from 'react';
 import {
-  Text,
   SearchBar,
   Icon,
   useTheme,
@@ -14,6 +13,7 @@ import {
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
 import FiltersBottomSheet from '../components/FiltersBottomSheet';
 import ClimbListItem from '../components/ClimbListItem';
+import ClimbListScreenHeaderRight from '../components/ClimbListScreenHeaderRight';
 import Loading from '../components/Loading';
 import Error from '../components/Error';
 import { useAsync } from 'react-async-hook';
@@ -48,14 +48,13 @@ export default function ClimbListScreen({}: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => setIsAngleSelectVisible(true)}>
-          <Text style={styles.angleSelectButtonText}>
-            {climbFilters.angle}°
-          </Text>
-        </TouchableOpacity>
+        <ClimbListScreenHeaderRight
+          angle={climbFilters.angle}
+          onAnglePress={() => setIsAngleSelectVisible(true)}
+        />
       ),
     });
-  }, [navigation, climbFilters.angle, styles]);
+  }, [navigation, climbFilters.angle]);
 
   const renderItem = ({ item }: { item: DbClimb }) => {
     return (
@@ -144,11 +143,6 @@ const useStyles = makeStyles((theme, _props: Props) => ({
   filterButton: {
     padding: 4,
     marginRight: 8,
-  },
-  angleSelectButtonText: {
-    color: theme.colors.primary,
-    fontSize: 16,
-    marginRight: 15,
   },
   badge: {
     borderWidth: 0,
