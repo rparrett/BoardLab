@@ -175,9 +175,6 @@ export const useBluetoothState = create<BluetoothState>((set, get) => {
         // Discover services if not already done
         await connectedDevice.discoverAllServicesAndCharacteristics();
 
-        // Convert Uint8Array to base64 string (required by react-native-ble-plx)
-        const base64Data = btoa(String.fromCharCode(...data));
-
         console.log(`BLE: Writing to characteristic (${data.length} bytes):`);
 
         // Log the data for debugging
@@ -192,14 +189,33 @@ export const useBluetoothState = create<BluetoothState>((set, get) => {
           );
         });
 
-        // Write to characteristic
-        await connectedDevice.writeCharacteristicWithResponseForService(
-          DATA_SERVICE_UUID,
-          DATA_CHARACTERISTIC_UUID,
-          base64Data,
-        );
+        // Chunk data into 20-byte packets to fit within BLE MTU
+        const CHUNK_SIZE = 20;
+        for (let i = 0; i < data.length; i += CHUNK_SIZE) {
+          const chunk = data.slice(i, i + CHUNK_SIZE);
+          const base64Chunk = btoa(String.fromCharCode(...chunk));
 
-        console.log('BLE: Successfully wrote data to characteristic');
+          console.log(
+            `BLE: Writing chunk ${Math.floor(i / CHUNK_SIZE) + 1}/${Math.ceil(
+              data.length / CHUNK_SIZE,
+            )} (${chunk.length} bytes)`,
+          );
+
+          await connectedDevice.writeCharacteristicWithResponseForService(
+            DATA_SERVICE_UUID,
+            DATA_CHARACTERISTIC_UUID,
+            base64Chunk,
+          );
+
+          // Small delay between chunks to ensure reliable transmission
+          if (i + CHUNK_SIZE < data.length) {
+            await new Promise(resolve => setTimeout(resolve, 10));
+          }
+        }
+
+        console.log(
+          'BLE: Successfully wrote all data chunks to characteristic',
+        );
         return true;
       } catch (error) {
         console.error('BLE write error:', error);
