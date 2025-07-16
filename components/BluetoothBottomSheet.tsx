@@ -13,14 +13,14 @@ type ParsedDeviceName = {
 const parseDeviceName = (name: string | null): ParsedDeviceName => {
   if (!name || name === 'null' || name === 'undefined') return null;
 
-  // Format: "Friendly Name@3#456" or "Friendly Name@3"
-  const match = name.match(/^(.+)@(\d+)(?:#(.+))?$/);
+  // Format: "Friendly Name#SerialNumber@ProtocolLevel" or "Friendly Name@ProtocolLevel"
+  const match = name.match(/^(.+?)(?:#(\d+))?@(\d+)$/);
   if (!match) return null;
 
   return {
     friendlyName: match[1],
-    protocolLevel: parseInt(match[2], 10),
-    serialNumber: match[3] || '',
+    protocolLevel: parseInt(match[3], 10),
+    serialNumber: match[2] || '',
   };
 };
 
