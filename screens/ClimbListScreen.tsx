@@ -85,18 +85,6 @@ export default function ClimbListScreen({}: Props) {
           inputContainerStyle={styles.searchBarInputContainer}
           inputStyle={styles.searchBarInput}
           placeholderTextColor={theme.colors.grey2}
-          clearIcon=<Icon
-            size={20}
-            type="ionicons"
-            name="close"
-            iconStyle={styles.searchBarIcon}
-          />
-          searchIcon=<Icon
-            size={20}
-            type="ionicons"
-            name="search"
-            iconStyle={styles.searchBarIcon}
-          />
         />
         <TouchableOpacity
           style={styles.filterButton}
