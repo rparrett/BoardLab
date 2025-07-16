@@ -66,7 +66,7 @@ type DatabaseContextType = {
   getFilteredClimbs: (
     filters: ClimbFilters,
   ) => Promise<IndexedMap<string, DbClimb>>;
-  getClimb: (uuid: string) => Promise<DbClimb | null>;
+  getClimb: (uuid: string, angle?: number) => Promise<DbClimb | null>;
   getPlacementData: () => Promise<Map<number, PlacementData>>;
   getRoles: (productId: number) => Promise<Map<number, Role>>;
   getAvailableGrades: () => Promise<GradeOption[]>;
@@ -168,7 +168,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     return new IndexedMap(climbs, climb => climb.uuid);
   };
 
-  const getClimb = async (uuid: string): Promise<DbClimb | null> => {
+  const getClimb = async (uuid: string, angle?: number): Promise<DbClimb | null> => {
     if (!db) {
       console.warn('Attempting to query with no database connection.');
       return null;
@@ -191,11 +191,11 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         difficulty_grades.boulder_name AS grade_name
       FROM climbs
       LEFT JOIN climb_cache_fields ON climbs.uuid = climb_cache_fields.climb_uuid
-      LEFT JOIN climb_stats ON climbs.uuid = climb_stats.climb_uuid
-      LEFT JOIN difficulty_grades ON ROUND(climb_cache_fields.display_difficulty) = difficulty_grades.difficulty
+      LEFT JOIN climb_stats ON climbs.uuid = climb_stats.climb_uuid AND climb_stats.angle = ?
+      LEFT JOIN difficulty_grades ON ROUND(climb_stats.display_difficulty) = difficulty_grades.difficulty
       WHERE climbs.uuid = ?
       `,
-      [uuid],
+      [angle || 40, uuid],
     );
 
     if (rows && rows.length > 0) {

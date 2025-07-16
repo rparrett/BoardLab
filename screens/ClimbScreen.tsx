@@ -33,8 +33,8 @@ export default function ClimbScreen({ route }: Props) {
     new IndexedMap<string, DbClimb>([], climb => climb.uuid),
   );
   const asyncClimb = useAsync(() => {
-    return getClimb(uuid);
-  }, [uuid, ready]);
+    return getClimb(uuid, climbFilters.angle);
+  }, [uuid, climbFilters.angle, ready]);
   const { sendToBoard } = useBleClimbSender();
 
   // Keep track of the currently displayed climb (only update when new data is available)
