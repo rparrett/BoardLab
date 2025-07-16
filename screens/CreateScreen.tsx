@@ -94,10 +94,7 @@ export default function CreateScreen({}: Props) {
     navigation.setOptions({
       headerRight: () => (
         <View style={styles.headerButtons}>
-          <TouchableOpacity
-            onPress={clearClimbInProgress}
-            style={styles.clearButton}
-          >
+          <TouchableOpacity onPress={clearClimbInProgress}>
             <Icon name="eraser" type="material-community" size={24} />
           </TouchableOpacity>
           <BluetoothHeaderButton />
@@ -218,9 +215,6 @@ const styles = StyleSheet.create({
   headerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  clearButton: {
-    padding: 8,
-    marginRight: 8,
+    gap: 16,
   },
 });

@@ -1,7 +1,7 @@
 import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
-import { Text, Icon } from '@rn-vui/themed';
-import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native';
+import { Text, Icon, makeStyles } from '@rn-vui/themed';
+import { View, TouchableOpacity, Alert } from 'react-native';
 import { useDatabase, DbClimb } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
 import { useLayoutEffect, useMemo, useEffect, useState } from 'react';
@@ -14,6 +14,7 @@ import BoardDisplay from '../components/BoardDisplay';
 import BluetoothBottomSheet from '../components/BluetoothBottomSheet';
 import BluetoothHeaderButton from '../components/BluetoothHeaderButton';
 import ShareBottomSheet from '../components/ShareBottomSheet';
+import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
 import { useBleClimbSender } from '../lib/useBleClimbSender';
 import { parseFramesString, type ClimbPlacements } from '../lib/frames-utils';
 
@@ -26,7 +27,9 @@ export default function ClimbScreen({ route }: Props) {
   let { uuid } = params;
   const navigation = useNavigation<ClimbsStackNavigationProp>();
   const { getClimb, getFilteredClimbs, ready } = useDatabase();
-  const { climbFilters, climbInProgress, setClimbInProgress } = useAppState();
+  const { climbFilters, climbInProgress, setClimbInProgress, setAngle } =
+    useAppState();
+  const styles = useStyles();
 
   // Cache filtered climbs for fast navigation
   const [climbsCache, setClimbsCache] = useState<IndexedMap<string, DbClimb>>(
@@ -40,6 +43,7 @@ export default function ClimbScreen({ route }: Props) {
   // Keep track of the currently displayed climb (only update when new data is available)
   const [displayedClimb, setDisplayedClimb] = useState<DbClimb | null>(null);
   const [isShareVisible, setIsShareVisible] = useState(false);
+  const [isAngleSelectVisible, setIsAngleSelectVisible] = useState(false);
 
   // Update displayed climb when new data becomes available
   useEffect(() => {
@@ -104,10 +108,21 @@ export default function ClimbScreen({ route }: Props) {
     setIsShareVisible(true);
   };
 
+  const handleAngleSelect = (option: { label: string; value: number }) => {
+    setAngle(option.value);
+    setIsAngleSelectVisible(false);
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
+      title: '',
       headerRight: () => (
         <View style={styles.headerRight}>
+          <TouchableOpacity onPress={() => setIsAngleSelectVisible(true)}>
+            <Text style={styles.angleSelectButtonText}>
+              {climbFilters.angle}°
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={handleSendToCreate}>
             <Icon
               name="content-copy"
@@ -127,7 +142,7 @@ export default function ClimbScreen({ route }: Props) {
       // screen.
       gestureEnabled: false,
     });
-  }, [navigation, handleSendToCreate, handleShare]);
+  }, [navigation, handleSendToCreate, handleShare, climbFilters.angle]);
 
   const handleSwipeLeft = () => {
     const nextUuid = climbsCache.getNextKey(uuid);
@@ -183,11 +198,17 @@ export default function ClimbScreen({ route }: Props) {
         onBackdropPress={() => setIsShareVisible(false)}
         climbUuid={uuid}
       />
+      <AngleSelectBottomSheet
+        isVisible={isAngleSelectVisible}
+        selectedAngle={climbFilters.angle}
+        onSelect={handleAngleSelect}
+        onBackdropPress={() => setIsAngleSelectVisible(false)}
+      />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(theme => ({
   container: {
     flex: 1,
   },
@@ -212,6 +233,10 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
   },
-});
+  angleSelectButtonText: {
+    color: theme.colors.primary,
+    fontSize: 16,
+  },
+}));
