@@ -57,6 +57,7 @@ export type ClimbFilters = {
   angle: number;
   search: string;
   grades: number[]; // Array of selected difficulty values, empty array means no filter
+  setAtCurrentAngle: boolean; // Filter for climbs set at current angle ±5 degrees
 };
 
 type DatabaseContextType = {
@@ -132,6 +133,12 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       params.push(...filters.grades);
     }
 
+    // Add setter angle filter if enabled
+    if (filters.setAtCurrentAngle) {
+      whereClause += ` AND climbs.angle BETWEEN ? AND ?`;
+      params.push(filters.angle - 5, filters.angle + 5);
+    }
+
     let { rows } = await db.executeAsync(
       `
       SELECT
@@ -168,7 +175,10 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     return new IndexedMap(climbs, climb => climb.uuid);
   };
 
-  const getClimb = async (uuid: string, angle?: number): Promise<DbClimb | null> => {
+  const getClimb = async (
+    uuid: string,
+    angle?: number,
+  ): Promise<DbClimb | null> => {
     if (!db) {
       console.warn('Attempting to query with no database connection.');
       return null;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Switch } from 'react-native';
 import { BottomSheet, makeStyles, Text } from '@rn-vui/themed';
 import { useAsync } from 'react-async-hook';
 import { useDatabase } from '../contexts/DatabaseProvider';
@@ -18,7 +18,7 @@ export default function FiltersBottomSheet({
   onBackdropPress,
 }: FiltersBottomSheetProps) {
   const { getAvailableGrades, ready } = useDatabase();
-  const { climbFilters, setGrades } = useAppState();
+  const { climbFilters, setGrades, setSetAtCurrentAngle } = useAppState();
   const styles = useStyles();
 
   const asyncGrades = useAsync(() => {
@@ -93,6 +93,19 @@ export default function FiltersBottomSheet({
           </View>
         )}
       </View>
+
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Setter Angle</Text>
+        </View>
+        <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>Set at current angle (±5°)</Text>
+          <Switch
+            value={climbFilters.setAtCurrentAngle}
+            onValueChange={setSetAtCurrentAngle}
+          />
+        </View>
+      </View>
     </BottomSheet>
   );
 }
@@ -149,5 +162,15 @@ const useStyles = makeStyles(theme => ({
   },
   gradeChipTextSelected: {
     color: theme.colors.white,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  switchLabel: {
+    fontSize: 16,
+    color: theme.colors.grey1,
   },
 }));

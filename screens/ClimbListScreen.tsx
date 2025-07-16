@@ -27,7 +27,9 @@ export default function ClimbListScreen({}: Props) {
   const { climbFilters, setAngle, setSearchText, lastViewedClimb } =
     useAppState();
 
-  const activeFilterCount = climbFilters.grades?.length > 0 ? 1 : 0;
+  const activeFilterCount =
+    (climbFilters.grades?.length > 0 ? 1 : 0) +
+    (climbFilters.setAtCurrentAngle ? 1 : 0);
 
   const { theme } = useTheme();
   const styles = useStyles();
