@@ -18,7 +18,8 @@ export default function FiltersBottomSheet({
   onBackdropPress,
 }: FiltersBottomSheetProps) {
   const { getAvailableGrades, ready } = useDatabase();
-  const { climbFilters, setGrades, setSetAtCurrentAngle } = useAppState();
+  const { climbFilters, setGrades, setSetAtCurrentAngle, setDiscoveryMode } =
+    useAppState();
   const styles = useStyles();
 
   const asyncGrades = useAsync(() => {
@@ -103,6 +104,21 @@ export default function FiltersBottomSheet({
           <Switch
             value={climbFilters.setAtCurrentAngle}
             onValueChange={setSetAtCurrentAngle}
+          />
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Discovery Mode</Text>
+        </View>
+        <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>
+            Lesser known climbs by great setters
+          </Text>
+          <Switch
+            value={climbFilters.discoveryMode}
+            onValueChange={setDiscoveryMode}
           />
         </View>
       </View>
