@@ -24,7 +24,8 @@ type Props = StaticScreenProps<{}>;
 export default function ClimbListScreen({}: Props) {
   const navigation = useNavigation<ClimbsStackNavigationProp>();
   const { getFilteredClimbs, ready } = useDatabase();
-  const { climbFilters, setAngle, setSearchText } = useAppState();
+  const { climbFilters, setAngle, setSearchText, lastViewedClimb } =
+    useAppState();
 
   const activeFilterCount = climbFilters.grades?.length > 0 ? 1 : 0;
 
@@ -54,7 +55,7 @@ export default function ClimbListScreen({}: Props) {
         />
       ),
     });
-  }, [navigation, climbFilters.angle]);
+  }, [navigation, climbFilters.angle, lastViewedClimb]);
 
   const renderItem = ({ item }: { item: DbClimb }) => {
     return (

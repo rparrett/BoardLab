@@ -17,6 +17,10 @@ interface AppState {
   removePlacement: (placementId: number) => void;
   clearClimbInProgress: () => void;
 
+  // Last viewed climb
+  lastViewedClimb: string | null; // climb UUID
+  setLastViewedClimb: (climbUuid: string) => void;
+
   // Cached container dimensions for BoardDisplay
   cachedContainerDimensions: { width: number; height: number } | null;
   setCachedContainerDimensions: (dimensions: {
@@ -58,6 +62,10 @@ export const useAppState = create<AppState>()(
         }),
       clearClimbInProgress: () => set({ climbInProgress: new Map() }),
 
+      // Last viewed climb
+      lastViewedClimb: null,
+      setLastViewedClimb: climbUuid => set({ lastViewedClimb: climbUuid }),
+
       // Cached container dimensions for BoardDisplay
       cachedContainerDimensions: null,
       setCachedContainerDimensions: dimensions =>
@@ -69,6 +77,7 @@ export const useAppState = create<AppState>()(
       partialize: state => ({
         climbFilters: state.climbFilters,
         climbInProgress: Array.from(state.climbInProgress.entries()),
+        lastViewedClimb: state.lastViewedClimb,
       }),
       onRehydrateStorage: () => state => {
         if (state?.climbInProgress) {

@@ -27,7 +27,7 @@ export default function ClimbScreen({ route }: Props) {
   let { uuid } = params;
   const navigation = useNavigation<ClimbsStackNavigationProp>();
   const { getClimb, getFilteredClimbs, ready } = useDatabase();
-  const { climbFilters, climbInProgress, setClimbInProgress, setAngle } =
+  const { climbFilters, climbInProgress, setClimbInProgress, setAngle, setLastViewedClimb } =
     useAppState();
   const styles = useStyles();
 
@@ -49,8 +49,10 @@ export default function ClimbScreen({ route }: Props) {
   useEffect(() => {
     if (asyncClimb.result) {
       setDisplayedClimb(asyncClimb.result);
+      // Track this climb as last viewed
+      setLastViewedClimb(uuid);
     }
-  }, [asyncClimb.result]);
+  }, [asyncClimb.result, uuid, setLastViewedClimb]);
 
   // Parse frames and set up BLE sender
   const climbPlacements = useMemo((): ClimbPlacements => {
