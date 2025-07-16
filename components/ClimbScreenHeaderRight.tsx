@@ -25,14 +25,19 @@ export default function ClimbScreenHeaderRight({
       </TouchableOpacity>
       <TouchableOpacity onPress={onCopyPress} style={styles.button}>
         <Icon
-          name="content-copy"
-          type="material"
+          name="pencil-box-multiple-outline"
+          type="material-community"
           size={24}
           color={styles.icon.color}
         />
       </TouchableOpacity>
       <TouchableOpacity onPress={onSharePress} style={styles.button}>
-        <Icon name="share" type="material" size={24} color={styles.icon.color} />
+        <Icon
+          name="share"
+          type="material"
+          size={24}
+          color={styles.icon.color}
+        />
       </TouchableOpacity>
       <BluetoothHeaderButton />
     </View>
