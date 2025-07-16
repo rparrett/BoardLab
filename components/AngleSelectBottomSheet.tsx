@@ -79,7 +79,7 @@ const useStyles = makeStyles((theme, _props: Props) => ({
   listItemContainer: {
     backgroundColor: theme.colors.secondarySurface,
     margin: 0,
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
   listItemCheckboxContainer: {
     backgroundColor: 'none',
