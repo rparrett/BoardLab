@@ -241,7 +241,7 @@ export default function RadialMenu({
               const radians = (angle * Math.PI) / 180;
               const x = Math.cos(radians) * radius;
               const y = Math.sin(radians) * radius;
-              const animationDelay = 100 + index * 50;
+              const animationDelay = index * 25;
 
               return React.cloneElement(child, {
                 ...(child.props as any),
