@@ -80,3 +80,4 @@ yarn-error.log
 
 # Database files
 assets/db.sqlite3
+android/app/src/main/assets/custom/db.sqlite3
