@@ -1,12 +1,10 @@
 import { StaticScreenProps, useNavigation } from '@react-navigation/native';
-import {
-  StyleSheet,
-  View,
-  useColorScheme,
-} from 'react-native';
+import { View, useColorScheme, TouchableOpacity } from 'react-native';
+import { Text, makeStyles } from '@rn-vui/themed';
 import BoardDisplay, { PlacementPressEvent } from '../components/BoardDisplay';
 import BluetoothBottomSheet from '../components/BluetoothBottomSheet';
 import CreateScreenHeaderRight from '../components/CreateScreenHeaderRight';
+import ClimbEditBottomSheet from '../components/ClimbEditBottomSheet';
 import {
   RadialMenu,
   RadialMenuCenter,
@@ -27,11 +25,16 @@ type Props = StaticScreenProps<{
 export default function CreateScreen({}: Props) {
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
+  const styles = useStyles();
   const {
     climbInProgress,
     updatePlacement,
     removePlacement,
     clearClimbInProgress,
+    climbName,
+    climbDescription,
+    setClimbName,
+    setClimbDescription,
   } = useAppState();
   const { getRoles, ready } = useDatabase();
   const headerHeight = useHeaderHeight();
@@ -47,6 +50,8 @@ export default function CreateScreen({}: Props) {
   });
   const [showSpecialMenu, setShowSpecialMenu] = useState(false);
   const menuRef = useRef<RadialMenuRef>(null);
+
+  const [isClimbInfoVisible, setIsClimbInfoVisible] = useState(false);
 
   const asyncRoles = useAsync(() => {
     return getRoles(1);
@@ -132,6 +137,11 @@ export default function CreateScreen({}: Props) {
     closeRadialMenu();
   };
 
+  const handleSaveClimbInfo = (name: string, description: string) => {
+    setClimbName(name);
+    setClimbDescription(description);
+  };
+
   return (
     <View
       style={styles.container}
@@ -140,6 +150,16 @@ export default function CreateScreen({}: Props) {
         setContainerDimensions({ width, height });
       }}
     >
+      <TouchableOpacity
+        style={styles.header}
+        onPress={() => setIsClimbInfoVisible(true)}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.title}>{climbName || 'Untitled Climb'}</Text>
+        <Text style={styles.description}>
+          {climbDescription || 'Tap to add description'}
+        </Text>
+      </TouchableOpacity>
       <BoardDisplay placements={climbInProgress} onPress={handlePress} />
       <BluetoothBottomSheet />
 
@@ -197,12 +217,37 @@ export default function CreateScreen({}: Props) {
           );
         })}
       </RadialMenu>
+
+      <ClimbEditBottomSheet
+        isVisible={isClimbInfoVisible}
+        onBackdropPress={() => setIsClimbInfoVisible(false)}
+        name={climbName}
+        description={climbDescription}
+        onSave={handleSaveClimbInfo}
+      />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(theme => ({
   container: {
     flex: 1,
   },
-});
+  header: {
+    padding: 20,
+    alignItems: 'center',
+    gap: 8,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: theme.colors.grey1,
+  },
+  description: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: theme.colors.grey2,
+    minHeight: 20,
+  },
+}));

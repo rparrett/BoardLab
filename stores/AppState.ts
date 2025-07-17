@@ -19,6 +19,12 @@ interface AppState {
   removePlacement: (placementId: number) => void;
   clearClimbInProgress: () => void;
 
+  // Climb metadata
+  climbName: string;
+  climbDescription: string;
+  setClimbName: (name: string) => void;
+  setClimbDescription: (description: string) => void;
+
   // Last viewed climb
   lastViewedClimb: string | null; // climb UUID
   setLastViewedClimb: (climbUuid: string) => void;
@@ -78,6 +84,13 @@ export const useAppState = create<AppState>()(
         }),
       clearClimbInProgress: () => set({ climbInProgress: new Map() }),
 
+      // Climb metadata
+      climbName: '',
+      climbDescription: '',
+      setClimbName: name => set({ climbName: name }),
+      setClimbDescription: description =>
+        set({ climbDescription: description }),
+
       // Last viewed climb
       lastViewedClimb: null,
       setLastViewedClimb: climbUuid => set({ lastViewedClimb: climbUuid }),
@@ -93,6 +106,8 @@ export const useAppState = create<AppState>()(
       partialize: state => ({
         climbFilters: state.climbFilters,
         climbInProgress: Array.from(state.climbInProgress.entries()),
+        climbName: state.climbName,
+        climbDescription: state.climbDescription,
         lastViewedClimb: state.lastViewedClimb,
       }),
       onRehydrateStorage: () => state => {

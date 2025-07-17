@@ -20,7 +20,7 @@ export default function ClimbListScreenHeaderRight({
 
   const handleLastViewedPress = () => {
     if (lastViewedClimb) {
-      navigation.navigate('Climb', { uuid: lastViewedClimb });
+      navigation.navigate('Climb' as any, { uuid: lastViewedClimb });
     }
   };
 
