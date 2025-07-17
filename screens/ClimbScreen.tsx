@@ -1,7 +1,7 @@
 import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
 import { Text, makeStyles, useTheme } from '@rn-vui/themed';
-import { View, Alert } from 'react-native';
+import { View, Alert, TouchableOpacity } from 'react-native';
 import { useDatabase, DbClimb } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
 import { useLayoutEffect, useMemo, useEffect, useState } from 'react';
@@ -15,6 +15,7 @@ import BluetoothBottomSheet from '../components/BluetoothBottomSheet';
 import ShareBottomSheet from '../components/ShareBottomSheet';
 import CompositeIcon from '../components/CompositeIcon';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
+import ClimbInfoBottomSheet from '../components/ClimbInfoBottomSheet';
 import ClimbScreenHeaderRight from '../components/ClimbScreenHeaderRight';
 import { useBleClimbSender } from '../lib/useBleClimbSender';
 import { parseFramesString, type ClimbPlacements } from '../lib/frames-utils';
@@ -51,6 +52,7 @@ export default function ClimbScreen({ route }: Props) {
   const [displayedClimb, setDisplayedClimb] = useState<DbClimb | null>(null);
   const [isShareVisible, setIsShareVisible] = useState(false);
   const [isAngleSelectVisible, setIsAngleSelectVisible] = useState(false);
+  const [isInfoVisible, setIsInfoVisible] = useState(false);
 
   // Update displayed climb when new data becomes available
   useEffect(() => {
@@ -170,7 +172,11 @@ export default function ClimbScreen({ route }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <TouchableOpacity
+        style={styles.header}
+        onPress={() => setIsInfoVisible(true)}
+        activeOpacity={0.7}
+      >
         <Text style={styles.title}>{climb.name}</Text>
         <Text style={styles.setter}>{climb.setter_username}</Text>
         <View style={styles.gradeStarsRow}>
@@ -189,7 +195,7 @@ export default function ClimbScreen({ route }: Props) {
             <StarRating rating={climb.total_quality_average} size={16} />
           )}
         </View>
-      </View>
+      </TouchableOpacity>
 
       <BoardDisplay
         placements={climbPlacements}
@@ -207,6 +213,12 @@ export default function ClimbScreen({ route }: Props) {
         selectedAngle={climbFilters.angle}
         onSelect={handleAngleSelect}
         onBackdropPress={() => setIsAngleSelectVisible(false)}
+      />
+      <ClimbInfoBottomSheet
+        isVisible={isInfoVisible}
+        onBackdropPress={() => setIsInfoVisible(false)}
+        climb={climb}
+        currentAngle={climbFilters.angle}
       />
     </View>
   );

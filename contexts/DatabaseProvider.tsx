@@ -15,7 +15,8 @@ export type DbClimb = {
   layout_id: number;
   is_draft: boolean;
   is_listed: boolean;
-  angle: number;
+  angle: number | null;
+  created_at: string;
   //
   total_ascensionist_count: number | null;
   total_display_difficulty: number | null;
