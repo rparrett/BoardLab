@@ -9,6 +9,7 @@ import BoardDisplay, { PlacementPressEvent } from '../components/BoardDisplay';
 import BluetoothBottomSheet from '../components/BluetoothBottomSheet';
 import CreateScreenHeaderRight from '../components/CreateScreenHeaderRight';
 import ClimbEditBottomSheet from '../components/ClimbEditBottomSheet';
+import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
 import {
   RadialMenu,
   RadialMenuCenter,
@@ -18,13 +19,7 @@ import {
 import { useAppState } from '../stores/AppState';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
-import {
-  useLayoutEffect,
-  useRef,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
+import { useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useBleClimbSender } from '../lib/useBleClimbSender';
 
@@ -37,6 +32,7 @@ export default function CreateScreen({}: Props) {
   const colorScheme = useColorScheme();
   const styles = useStyles();
   const {
+    climbFilters,
     climbInProgress,
     updatePlacement,
     removePlacement,
@@ -45,6 +41,7 @@ export default function CreateScreen({}: Props) {
     climbDescription,
     setClimbName,
     setClimbDescription,
+    setAngle,
   } = useAppState();
   const { getRoles, ready } = useDatabase();
   const headerHeight = useHeaderHeight();
@@ -62,6 +59,7 @@ export default function CreateScreen({}: Props) {
   const menuRef = useRef<RadialMenuRef>(null);
 
   const [isClimbInfoVisible, setIsClimbInfoVisible] = useState(false);
+  const [isAngleSelectVisible, setIsAngleSelectVisible] = useState(false);
 
   const asyncRoles = useAsync(() => {
     return getRoles(1);
@@ -108,10 +106,14 @@ export default function CreateScreen({}: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <CreateScreenHeaderRight onErasePress={clearClimbInProgress} />
+        <CreateScreenHeaderRight
+          angle={climbFilters.angle}
+          onAnglePress={() => setIsAngleSelectVisible(true)}
+          onErasePress={clearClimbInProgress}
+        />
       ),
     });
-  }, [navigation, clearClimbInProgress]);
+  }, [navigation, clearClimbInProgress, climbFilters.angle]);
 
   const handlePress = (event: PlacementPressEvent) => {
     setSelectedPlacementId(event.placementId);
@@ -152,6 +154,11 @@ export default function CreateScreen({}: Props) {
   const handleSaveClimbInfo = (name: string, description: string) => {
     setClimbName(name);
     setClimbDescription(description);
+  };
+
+  const handleAngleSelect = (option: { label: string; value: number }) => {
+    setAngle(option.value);
+    setIsAngleSelectVisible(false);
   };
 
   return (
@@ -236,6 +243,12 @@ export default function CreateScreen({}: Props) {
         name={climbName}
         description={climbDescription}
         onSave={handleSaveClimbInfo}
+      />
+      <AngleSelectBottomSheet
+        isVisible={isAngleSelectVisible}
+        selectedAngle={climbFilters.angle}
+        onSelect={handleAngleSelect}
+        onBackdropPress={() => setIsAngleSelectVisible(false)}
       />
     </View>
   );

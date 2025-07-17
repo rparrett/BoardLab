@@ -1,19 +1,26 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import { Icon, makeStyles } from '@rn-vui/themed';
+import { Text, Icon, makeStyles } from '@rn-vui/themed';
 import BluetoothHeaderButton from './BluetoothHeaderButton';
 
 interface CreateScreenHeaderRightProps {
+  angle: number;
+  onAnglePress: () => void;
   onErasePress: () => void;
 }
 
 export default function CreateScreenHeaderRight({
+  angle,
+  onAnglePress,
   onErasePress,
 }: CreateScreenHeaderRightProps) {
   const styles = useStyles();
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={onAnglePress} style={styles.button}>
+        <Text style={styles.angleText}>{angle}°</Text>
+      </TouchableOpacity>
       <TouchableOpacity onPress={onErasePress} style={styles.button}>
         <Icon
           name="eraser"
@@ -35,6 +42,10 @@ const useStyles = makeStyles(theme => ({
   },
   button: {
     padding: 8,
+  },
+  angleText: {
+    color: theme.colors.primary,
+    fontSize: 16,
   },
   icon: {
     color: theme.colors.primary,
