@@ -124,7 +124,8 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     const climbs: DbClimb[] = [];
 
     // Build the WHERE clause dynamically based on filters
-    let whereClause = 'WHERE climbs.layout_id = 1 AND climbs.name LIKE ?';
+    let whereClause =
+      'WHERE climbs.layout_id = 1 AND climbs.frames_count = 1 AND climbs.name LIKE ?';
     let params: any[] = [filters.angle, `%${filters.search}%`];
 
     // Add grade filter if provided
@@ -166,7 +167,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       LEFT JOIN difficulty_grades ON ROUND(climb_stats.display_difficulty) = difficulty_grades.difficulty
       ${whereClause}
       ORDER BY climb_stats.ascensionist_count DESC
-      LIMIT 100
+      LIMIT 1000
       `,
       params,
     );

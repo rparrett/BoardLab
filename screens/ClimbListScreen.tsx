@@ -50,7 +50,12 @@ export default function ClimbListScreen({}: Props) {
   }, [climbFilters, ready]);
 
   useLayoutEffect(() => {
+    const climbCount = asyncClimbs.result?.size || 0;
+    const formattedCount = climbCount.toLocaleString();
+    const title = climbCount === 1 ? '1 Climb' : `${formattedCount} Climbs`;
+
     navigation.setOptions({
+      title,
       headerRight: () => (
         <ClimbListScreenHeaderRight
           angle={climbFilters.angle}
@@ -58,7 +63,7 @@ export default function ClimbListScreen({}: Props) {
         />
       ),
     });
-  }, [navigation, climbFilters.angle, lastViewedClimb]);
+  }, [navigation, climbFilters.angle, lastViewedClimb, asyncClimbs.result]);
 
   const renderItem = ({ item }: { item: DbClimb }) => {
     return (
