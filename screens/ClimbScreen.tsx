@@ -180,7 +180,7 @@ export default function ClimbScreen({ route }: Props) {
         <Text style={styles.title}>{climb.name}</Text>
         <Text style={styles.setter}>{climb.setter_username}</Text>
         <View style={styles.gradeStarsRow}>
-          {climb.description.toLowerCase().includes('no matching') && (
+          {climb.description.toLowerCase().includes('no match') && (
             <CompositeIcon
               baseIcon={{ name: 'do-not-disturb', type: 'materialicons' }}
               overlayIcon={{ name: 'hands-pray', type: 'material-community' }}
