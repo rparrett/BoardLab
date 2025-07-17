@@ -1,4 +1,8 @@
-import { StaticScreenProps, useNavigation } from '@react-navigation/native';
+import {
+  StaticScreenProps,
+  useNavigation,
+  useFocusEffect,
+} from '@react-navigation/native';
 import { View, useColorScheme, TouchableOpacity } from 'react-native';
 import { Text, makeStyles } from '@rn-vui/themed';
 import BoardDisplay, { PlacementPressEvent } from '../components/BoardDisplay';
@@ -14,7 +18,13 @@ import {
 import { useAppState } from '../stores/AppState';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
-import { useLayoutEffect, useRef, useState, useEffect } from 'react';
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useBleClimbSender } from '../lib/useBleClimbSender';
 
@@ -59,10 +69,12 @@ export default function CreateScreen({}: Props) {
 
   const { sendToBoard } = useBleClimbSender();
 
-  // Send climb in progress to board whenever it changes (including empty to clear board)
-  useEffect(() => {
-    sendToBoard(climbInProgress);
-  }, [climbInProgress]);
+  // Send climb in progress to board when screen is focused (initial render + navigation)
+  useFocusEffect(
+    useCallback(() => {
+      sendToBoard(climbInProgress);
+    }, [climbInProgress]),
+  );
 
   // Map role IDs to appropriate icons
   const roleIconMap: Record<number, { iconName: string; iconType: string }> = {

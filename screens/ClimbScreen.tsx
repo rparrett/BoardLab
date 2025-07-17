@@ -1,10 +1,20 @@
-import { StaticScreenProps, useNavigation } from '@react-navigation/native';
+import {
+  StaticScreenProps,
+  useNavigation,
+  useFocusEffect,
+} from '@react-navigation/native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
 import { Text, makeStyles, useTheme } from '@rn-vui/themed';
 import { View, Alert, TouchableOpacity } from 'react-native';
 import { useDatabase, DbClimb } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
-import { useLayoutEffect, useMemo, useEffect, useState } from 'react';
+import {
+  useLayoutEffect,
+  useMemo,
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
 import { IndexedMap } from '../lib/IndexedMap';
 import { useAppState } from '../stores/AppState';
 import Loading from '../components/Loading';
@@ -81,13 +91,14 @@ export default function ClimbScreen({ route }: Props) {
     loadClimbsList();
   }, [climbFilters, ready, getFilteredClimbs]); // Reload when filters or ready changes
 
-  // Send climb data when it loads (including empty climbs to clear the board)
-  useEffect(() => {
-    // Only send when we have a displayed climb (even if it has no frames)
-    if (displayedClimb) {
-      sendToBoard(climbPlacements);
-    }
-  }, [climbPlacements, displayedClimb]);
+  // Send climb data when screen is focused (initial render + navigation)
+  useFocusEffect(
+    useCallback(() => {
+      if (displayedClimb) {
+        sendToBoard(climbPlacements);
+      }
+    }, [climbPlacements, displayedClimb]),
+  );
 
   const handleSendToCreate = () => {
     const copyAndNavigate = () => {
