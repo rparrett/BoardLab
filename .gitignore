@@ -77,3 +77,6 @@ yarn-error.log
 # IDEs
 
 .vscode
+
+# Database files
+assets/db.sqlite3
