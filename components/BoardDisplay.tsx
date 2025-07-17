@@ -285,9 +285,9 @@ export default function BoardDisplay({
     >
       {containerDimensions.width > 0 && (
         <ReactNativeZoomableView
-          maxZoom={4}
+          maxZoom={3}
           minZoom={1}
-          zoomStep={1.5}
+          zoomStep={2}
           initialZoom={1}
           bindToBorders={true}
           disablePanOnInitialZoom={true}
