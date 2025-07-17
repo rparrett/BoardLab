@@ -84,7 +84,7 @@ export default function ClimbScreen({ route }: Props) {
   // Send climb data when it loads (including empty climbs to clear the board)
   useEffect(() => {
     sendToBoard(climbPlacements);
-  }, [climbPlacements, sendToBoard]);
+  }, [climbPlacements]);
 
   const handleSendToCreate = () => {
     const copyAndNavigate = () => {

@@ -62,7 +62,7 @@ export default function CreateScreen({}: Props) {
   // Send climb in progress to board whenever it changes (including empty to clear board)
   useEffect(() => {
     sendToBoard(climbInProgress);
-  }, [climbInProgress, sendToBoard]);
+  }, [climbInProgress]);
 
   // Map role IDs to appropriate icons
   const roleIconMap: Record<number, { iconName: string; iconType: string }> = {
