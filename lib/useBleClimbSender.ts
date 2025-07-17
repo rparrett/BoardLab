@@ -23,6 +23,8 @@ export function useBleClimbSender() {
 
   const sendToBoard = useCallback(
     async (climbPlacements: ClimbPlacements): Promise<boolean> => {
+      console.debug('sendToBoard', climbPlacements.size, 'entries');
+
       if (
         !climbPlacements ||
         !asyncPlacementData.result ||
@@ -36,8 +38,8 @@ export function useBleClimbSender() {
       const placementData = asyncPlacementData.result;
       const roles = asyncRoles.result;
 
-      console.log('=== BLE Debug Info ===');
-      console.log('Climb placements:', Array.from(climbPlacements.entries()));
+      console.debug('=== BLE Debug Info ===');
+      console.debug('Climb placements:', Array.from(climbPlacements.entries()));
 
       // Convert to BLE data format using the climb placements
       const bleData = convertFramesToBleData(
@@ -45,16 +47,16 @@ export function useBleClimbSender() {
         placementData,
         roles,
       );
-      console.log('BLE data (position, [r,g,b]):', bleData);
+      console.debug('BLE data (position, [r,g,b]):', bleData);
 
       // Always encode and send, even if empty (to clear the board)
       const encodedData = encodeHoldsData(bleData, ApiLevel.Three);
-      console.log('Encoded packet length:', encodedData.length, 'bytes');
+      console.debug('Encoded packet length:', encodedData.length, 'bytes');
 
       // Send to the board
       const success = await writeToCharacteristic(encodedData);
       if (success) {
-        console.log(
+        console.debug(
           bleData.length > 0
             ? 'Successfully sent climb data to board'
             : 'Successfully cleared board (empty climb)',
@@ -62,7 +64,7 @@ export function useBleClimbSender() {
       } else {
         console.error('Failed to send data to board');
       }
-      console.log('=== End BLE Debug ===');
+      console.debug('=== End BLE Debug ===');
       return success;
     },
     [

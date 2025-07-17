@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, TextInput } from 'react-native';
 import { makeStyles, Text, Button } from '@rn-vui/themed';
 import BottomSheetHeader from './BottomSheetHeader';
