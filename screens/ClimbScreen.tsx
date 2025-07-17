@@ -1,6 +1,6 @@
 import { StaticScreenProps, useNavigation } from '@react-navigation/native';
 import { ClimbsStackNavigationProp } from '../navigators/ClimbsStack';
-import { Text, makeStyles } from '@rn-vui/themed';
+import { Text, makeStyles, useTheme } from '@rn-vui/themed';
 import { View, Alert } from 'react-native';
 import { useDatabase, DbClimb } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
@@ -13,6 +13,7 @@ import StarRating from '../components/StarRating';
 import BoardDisplay from '../components/BoardDisplay';
 import BluetoothBottomSheet from '../components/BluetoothBottomSheet';
 import ShareBottomSheet from '../components/ShareBottomSheet';
+import CompositeIcon from '../components/CompositeIcon';
 import AngleSelectBottomSheet from '../components/AngleSelectBottomSheet';
 import ClimbScreenHeaderRight from '../components/ClimbScreenHeaderRight';
 import { useBleClimbSender } from '../lib/useBleClimbSender';
@@ -27,9 +28,15 @@ export default function ClimbScreen({ route }: Props) {
   let { uuid } = params;
   const navigation = useNavigation<ClimbsStackNavigationProp>();
   const { getClimb, getFilteredClimbs, ready } = useDatabase();
-  const { climbFilters, climbInProgress, setClimbInProgress, setAngle, setLastViewedClimb } =
-    useAppState();
+  const {
+    climbFilters,
+    climbInProgress,
+    setClimbInProgress,
+    setAngle,
+    setLastViewedClimb,
+  } = useAppState();
   const styles = useStyles();
+  const { theme } = useTheme();
 
   // Cache filtered climbs for fast navigation
   const [climbsCache, setClimbsCache] = useState<IndexedMap<string, DbClimb>>(
@@ -167,6 +174,14 @@ export default function ClimbScreen({ route }: Props) {
         <Text style={styles.title}>{climb.name}</Text>
         <Text style={styles.setter}>{climb.setter_username}</Text>
         <View style={styles.gradeStarsRow}>
+          {climb.description.toLowerCase().includes('no matching') && (
+            <CompositeIcon
+              baseIcon={{ name: 'do-not-disturb', type: 'materialicons' }}
+              overlayIcon={{ name: 'hands-pray', type: 'material-community' }}
+              size={16}
+              color={theme.colors.black}
+            />
+          )}
           {climb.grade_name && (
             <Text style={styles.grade}>{climb.grade_name}</Text>
           )}
