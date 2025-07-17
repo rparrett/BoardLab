@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Share, Alert } from 'react-native';
+import { View, Share, Alert, Linking } from 'react-native';
 import { ListItem, makeStyles, Icon, useTheme } from '@rn-vui/themed';
 import QRCodeStyled from 'react-native-qrcode-styled';
 import BottomSheetHeader from './BottomSheetHeader';
@@ -35,6 +35,20 @@ export default function ShareBottomSheet({
     }
   };
 
+  const handleOpenInKilterBoard = async () => {
+    try {
+      const supported = await Linking.canOpenURL(climbUrl);
+      if (supported) {
+        await Linking.openURL(climbUrl);
+        onBackdropPress();
+      } else {
+        Alert.alert('Error', 'Cannot open URL');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to open URL');
+    }
+  };
+
   return (
     <SafeBottomSheet isVisible={isVisible} onBackdropPress={onBackdropPress}>
       <BottomSheetHeader title="Share Climb" onClose={onBackdropPress} />
@@ -47,6 +61,17 @@ export default function ShareBottomSheet({
         <Icon name="share" type="material" size={24} />
         <ListItem.Content>
           <ListItem.Title>Share</ListItem.Title>
+        </ListItem.Content>
+      </ListItem>
+
+      <ListItem
+        onPress={handleOpenInKilterBoard}
+        bottomDivider
+        containerStyle={styles.listItemContainer}
+      >
+        <Icon name="open-in-new" type="material" size={24} />
+        <ListItem.Content>
+          <ListItem.Title>Open in KilterBoard</ListItem.Title>
         </ListItem.Content>
       </ListItem>
 
