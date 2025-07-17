@@ -1,7 +1,8 @@
 import React from 'react';
 import { ActivityIndicator } from 'react-native';
-import { BottomSheet, ListItem, makeStyles } from '@rn-vui/themed';
+import { ListItem, makeStyles } from '@rn-vui/themed';
 import BottomSheetHeader from './BottomSheetHeader';
+import SafeBottomSheet from './SafeBottomSheet';
 import { useBluetoothState } from '../stores/BluetoothState';
 
 type ParsedDeviceName = {
@@ -41,10 +42,9 @@ export default function BluetoothBottomSheet() {
   const styles = useStyles();
 
   return (
-    <BottomSheet
+    <SafeBottomSheet
       isVisible={showDeviceScanner}
       onBackdropPress={handleBackdropPress}
-      scrollViewProps={{ style: styles.container }}
     >
       <BottomSheetHeader
         title="Bluetooth Devices"
@@ -99,17 +99,11 @@ export default function BluetoothBottomSheet() {
           </ListItem>
         );
       })}
-    </BottomSheet>
+    </SafeBottomSheet>
   );
 }
 
 const useStyles = makeStyles(theme => ({
-  container: {
-    backgroundColor: theme.colors.secondarySurface,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    paddingBottom: 20,
-  },
   listItemContainer: {
     backgroundColor: theme.colors.secondarySurface,
   },

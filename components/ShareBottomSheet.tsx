@@ -1,14 +1,9 @@
 import React from 'react';
 import { View, Share, Alert } from 'react-native';
-import {
-  BottomSheet,
-  ListItem,
-  makeStyles,
-  Icon,
-  useTheme,
-} from '@rn-vui/themed';
+import { ListItem, makeStyles, Icon, useTheme } from '@rn-vui/themed';
 import QRCodeStyled from 'react-native-qrcode-styled';
 import BottomSheetHeader from './BottomSheetHeader';
+import SafeBottomSheet from './SafeBottomSheet';
 
 interface ShareBottomSheetProps {
   isVisible: boolean;
@@ -41,11 +36,7 @@ export default function ShareBottomSheet({
   };
 
   return (
-    <BottomSheet
-      isVisible={isVisible}
-      onBackdropPress={onBackdropPress}
-      scrollViewProps={{ style: styles.container }}
-    >
+    <SafeBottomSheet isVisible={isVisible} onBackdropPress={onBackdropPress}>
       <BottomSheetHeader title="Share Climb" onClose={onBackdropPress} />
 
       <ListItem
@@ -70,17 +61,11 @@ export default function ShareBottomSheet({
           color={theme.colors.black}
         />
       </View>
-    </BottomSheet>
+    </SafeBottomSheet>
   );
 }
 
 const useStyles = makeStyles(theme => ({
-  container: {
-    backgroundColor: theme.colors.secondarySurface,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    paddingBottom: 20,
-  },
   listItemContainer: {
     backgroundColor: theme.colors.secondarySurface,
   },

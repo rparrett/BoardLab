@@ -1,6 +1,7 @@
 import React from 'react';
-import { BottomSheet, ListItem, makeStyles } from '@rn-vui/themed';
+import { ListItem, makeStyles } from '@rn-vui/themed';
 import BottomSheetHeader from './BottomSheetHeader';
+import SafeBottomSheet from './SafeBottomSheet';
 
 type AngleOption = {
   label: string;
@@ -37,11 +38,7 @@ export default function AngleSelectBottomSheet({
   const angleOptions = generateAngleOptions(0, 70, 5);
 
   return (
-    <BottomSheet
-      isVisible={isVisible}
-      onBackdropPress={onBackdropPress}
-      scrollViewProps={{ style: styles.container }}
-    >
+    <SafeBottomSheet isVisible={isVisible} onBackdropPress={onBackdropPress}>
       <BottomSheetHeader
         key="title"
         title="Select Angle"
@@ -66,16 +63,11 @@ export default function AngleSelectBottomSheet({
           )}
         </ListItem>
       ))}
-    </BottomSheet>
+    </SafeBottomSheet>
   );
 }
 
-const useStyles = makeStyles((theme, _props: Props) => ({
-  container: {
-    backgroundColor: theme.colors.secondarySurface,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
+const useStyles = makeStyles(theme => ({
   listItemContainer: {
     backgroundColor: theme.colors.secondarySurface,
     margin: 0,

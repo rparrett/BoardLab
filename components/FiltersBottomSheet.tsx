@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, TouchableOpacity, Switch } from 'react-native';
-import { BottomSheet, makeStyles, Text } from '@rn-vui/themed';
+import { makeStyles, Text } from '@rn-vui/themed';
 import { useAsync } from 'react-async-hook';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAppState } from '../stores/AppState';
 import BottomSheetHeader from './BottomSheetHeader';
+import SafeBottomSheet from './SafeBottomSheet';
 import Loading from './Loading';
 import Error from './Error';
 
@@ -45,11 +46,7 @@ export default function FiltersBottomSheet({
   };
 
   return (
-    <BottomSheet
-      isVisible={isVisible}
-      onBackdropPress={onBackdropPress}
-      scrollViewProps={{ style: styles.container }}
-    >
+    <SafeBottomSheet isVisible={isVisible} onBackdropPress={onBackdropPress}>
       <BottomSheetHeader title="Filters" onClose={onBackdropPress} />
 
       <View style={styles.section}>
@@ -122,17 +119,11 @@ export default function FiltersBottomSheet({
           />
         </View>
       </View>
-    </BottomSheet>
+    </SafeBottomSheet>
   );
 }
 
 const useStyles = makeStyles(theme => ({
-  container: {
-    backgroundColor: theme.colors.secondarySurface,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    paddingBottom: 20,
-  },
   section: {
     padding: 16,
     backgroundColor: theme.colors.secondarySurface,
