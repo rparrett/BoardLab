@@ -296,7 +296,10 @@ export default function BoardDisplay({
           onLongPress={handleLongPress}
           onStartShouldSetPanResponder={handleStartShouldSetPanResponder}
           onPanResponderEnd={handlePanResponderEnd}
-          onZoomEnd={(event, gestureState, zoomableViewEventObject) => {
+          onZoomEnd={(_event, _gestureState, zoomableViewEventObject) => {
+            setCurrentZoomLevel(zoomableViewEventObject.zoomLevel);
+          }}
+          onDoubleTapAfter={(_event, zoomableViewEventObject) => {
             setCurrentZoomLevel(zoomableViewEventObject.zoomLevel);
           }}
         >
