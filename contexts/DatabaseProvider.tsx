@@ -54,6 +54,15 @@ export type GradeOption = {
   name: string;
 };
 
+export type AngleStatsData = {
+  display_difficulty: number;
+  quality_average: number;
+  ascensionist_count: number;
+  fa_username: string;
+  fa_at: string;
+  grade_name: string | null;
+};
+
 export type ClimbFilters = {
   angle: number;
   search: string;
@@ -70,6 +79,9 @@ type DatabaseContextType = {
     filters: ClimbFilters,
   ) => Promise<IndexedMap<string, DbClimb>>;
   getClimb: (uuid: string, angle?: number) => Promise<DbClimb | null>;
+  getClimbStatsForAllAngles: (
+    uuid: string,
+  ) => Promise<Map<number, AngleStatsData>>;
   getPlacementData: () => Promise<Map<number, PlacementData>>;
   getRoles: (productId: number) => Promise<Map<number, Role>>;
   getAvailableGrades: () => Promise<GradeOption[]>;
@@ -351,6 +363,49 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     return rolesMap;
   };
 
+  const getClimbStatsForAllAngles = async (
+    uuid: string,
+  ): Promise<Map<number, AngleStatsData>> => {
+    if (!db) {
+      console.warn('Attempting to query with no database connection.');
+      return new Map();
+    }
+
+    let { rows } = await db.executeAsync(
+      `
+      SELECT
+        climb_stats.angle,
+        climb_stats.display_difficulty,
+        climb_stats.quality_average,
+        climb_stats.ascensionist_count,
+        climb_stats.fa_username,
+        climb_stats.fa_at,
+        difficulty_grades.boulder_name AS grade_name
+      FROM climb_stats
+      LEFT JOIN difficulty_grades ON ROUND(climb_stats.display_difficulty) = difficulty_grades.difficulty
+      WHERE climb_stats.climb_uuid = ?
+      `,
+      [uuid],
+    );
+
+    const statsMap = new Map<number, AngleStatsData>();
+    if (rows) {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows.item(i);
+        statsMap.set(row.angle, {
+          display_difficulty: row.display_difficulty,
+          quality_average: row.quality_average,
+          ascensionist_count: row.ascensionist_count,
+          fa_username: row.fa_username,
+          fa_at: row.fa_at,
+          grade_name: row.grade_name,
+        });
+      }
+    }
+
+    return statsMap;
+  };
+
   const getAvailableGrades = async (): Promise<GradeOption[]> => {
     if (!db) {
       console.warn('Attempting to query with no database connection.');
@@ -389,6 +444,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         error,
         getFilteredClimbs,
         getClimb,
+        getClimbStatsForAllAngles,
         getPlacementData,
         getRoles: getRoles,
         getAvailableGrades,

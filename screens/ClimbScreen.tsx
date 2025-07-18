@@ -38,7 +38,8 @@ export default function ClimbScreen({ route }: Props) {
   let { params } = route;
   let { uuid } = params;
   const navigation = useNavigation<ClimbsStackNavigationProp>();
-  const { getClimb, getFilteredClimbs, ready } = useDatabase();
+  const { getClimb, getFilteredClimbs, getClimbStatsForAllAngles, ready } =
+    useDatabase();
   const {
     climbFilters,
     climbInProgress,
@@ -56,6 +57,9 @@ export default function ClimbScreen({ route }: Props) {
   const asyncClimb = useAsync(() => {
     return getClimb(uuid, climbFilters.angle);
   }, [uuid, climbFilters.angle, ready]);
+  const asyncAngleStats = useAsync(() => {
+    return getClimbStatsForAllAngles(uuid);
+  }, [uuid, ready]);
   const { sendToBoard } = useBleClimbSender();
 
   // Keep track of the currently displayed climb (only update when new data is available)
@@ -227,6 +231,8 @@ export default function ClimbScreen({ route }: Props) {
         selectedAngle={climbFilters.angle}
         onSelect={handleAngleSelect}
         onBackdropPress={() => setIsAngleSelectVisible(false)}
+        angleStats={asyncAngleStats.result}
+        setterAngle={displayedClimb?.angle}
       />
       <ClimbInfoBottomSheet
         isVisible={isInfoVisible}
