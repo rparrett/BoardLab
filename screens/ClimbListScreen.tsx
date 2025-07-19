@@ -41,7 +41,7 @@ export default function ClimbListScreen({}: Props) {
     top: -2,
     right: -2,
     badgeStyle: styles.badge,
-  })(Icon);
+  })(Icon) as typeof Icon;
   const [isAngleSelectVisible, setIsAngleSelectVisible] = useState(false);
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
 
