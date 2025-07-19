@@ -1,2 +1,5 @@
 - Use `yarn`, NOT `npm`
-- Use `nvm use && yarn` to select the proper node version when running yarn
+- Format code after making changes with `yarn format`
+- Check code after making changed with `yarn lint`
+- Check typescript after making changes with `yarn tsc --noEmit`
+- If these commands fail, instruct the user to run claude in the correct node environment.
