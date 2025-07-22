@@ -43,7 +43,7 @@ export default function CreateScreen({}: Props) {
     setClimbDescription,
     setAngle,
   } = useAppState();
-  const { getRoles, ready } = useDatabase();
+  const { getRoles, insertClimb, ready } = useDatabase();
   const headerHeight = useHeaderHeight();
 
   const [radialMenuVisible, setRadialMenuVisible] = useState(false);
@@ -105,6 +105,14 @@ export default function CreateScreen({}: Props) {
   // Header buttons
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={handleSaveClimb}
+          style={{ paddingHorizontal: 16, paddingVertical: 8 }}
+        >
+          <Text style={{ color: '#007AFF', fontSize: 17 }}>Save</Text>
+        </TouchableOpacity>
+      ),
       headerRight: () => (
         <CreateScreenHeaderRight
           angle={climbFilters.angle}
@@ -159,6 +167,40 @@ export default function CreateScreen({}: Props) {
   const handleAngleSelect = (option: { label: string; value: number }) => {
     setAngle(option.value);
     setIsAngleSelectVisible(false);
+  };
+
+  const handleSaveClimb = async () => {
+    try {
+      // Validate that we have placements
+      if (climbInProgress.size === 0) {
+        // TODO: Show error message
+        console.warn('Cannot save climb with no placements');
+        console.log(climbInProgress);
+        return;
+      }
+
+      // Save climb to database
+      const uuid = await insertClimb({
+        name: climbName || 'Untitled Climb',
+        description: climbDescription || '',
+        frames: climbInProgress,
+        angle: climbFilters.angle,
+        setterUsername: 'LocalUser', // TODO: Get actual username
+      });
+
+      console.log('Climb saved with UUID:', uuid);
+
+      // Clear the creation state
+      clearClimbInProgress();
+      setClimbName('');
+      setClimbDescription('');
+
+      // Navigate back to climbs tab
+      navigation.navigate('Climbs');
+    } catch (error) {
+      console.error('Failed to save climb:', error);
+      // TODO: Show error message to user
+    }
   };
 
   return (

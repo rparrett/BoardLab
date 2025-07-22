@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { open, QuickSQLiteConnection } from 'react-native-quick-sqlite';
 import RNFS from 'react-native-fs';
 import { IndexedMap } from '../lib/IndexedMap';
+import { serializeFramesMap } from '../lib/frames-utils';
+import { v4 as uuidv4 } from 'uuid';
 
 export type DbClimb = {
   uuid: string;
@@ -86,6 +88,13 @@ type DatabaseContextType = {
   getPlacementData: () => Promise<Map<number, PlacementData>>;
   getRoles: (productId: number) => Promise<Map<number, Role>>;
   getAvailableGrades: () => Promise<GradeOption[]>;
+  insertClimb: (climbData: {
+    name: string;
+    description: string;
+    frames: Map<number, number>;
+    angle: number;
+    setterUsername?: string;
+  }) => Promise<string>;
 };
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(
@@ -443,6 +452,85 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     return grades;
   };
 
+  // Generate a UUID without hyphens (to match database format)
+  const generateUuid = (): string => {
+    return uuidv4().replace(/-/g, '');
+  };
+
+  const insertClimb = async (climbData: {
+    name: string;
+    description: string;
+    frames: Map<number, number>;
+    angle: number;
+    setterUsername?: string;
+  }): Promise<string> => {
+    if (!db) {
+      console.warn('Attempting to insert with no database connection.');
+      throw new Error('No database connection');
+    }
+
+    const uuid = generateUuid();
+    const framesString = serializeFramesMap(climbData.frames);
+    const now = new Date().toISOString();
+
+    const {
+      name,
+      description,
+      angle,
+      setterUsername = 'LocalUser',
+    } = climbData;
+
+    // Auto-detect if this is a "no match" climb based on description
+    const isNoMatch = /no match/i.test(description);
+
+    await db.executeAsync(
+      `INSERT INTO climbs (
+        uuid,
+        layout_id,
+        setter_id,
+        setter_username,
+        name,
+        description,
+        hsm,
+        edge_left,
+        edge_right,
+        edge_bottom,
+        edge_top,
+        angle,
+        frames_count,
+        frames_pace,
+        frames,
+        is_draft,
+        is_listed,
+        created_at,
+        is_nomatch
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        uuid,
+        1, // layout_id
+        1, // setter_id - default to 1 for now
+        setterUsername,
+        name,
+        description,
+        3, // hsm - most common value - no idea what this means
+        4, // edge_left - TODO use current board value
+        140, // edge_right - TODO use current board value
+        4, // edge_bottom - TODO use current board value
+        152, // edge_top - TODO use current board value
+        angle,
+        1, // frames_count - not doing multi-frame routes yet
+        0, // frames_pace - not doing multi-frame routes yet
+        framesString,
+        true, // is_draft - keep user-created climbs as drafts
+        false, // is_listed - start as private
+        now,
+        isNoMatch, // is_nomatch - auto-detected from description
+      ],
+    );
+
+    return uuid;
+  };
+
   return (
     <DatabaseContext.Provider
       value={{
@@ -455,6 +543,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         getPlacementData,
         getRoles: getRoles,
         getAvailableGrades,
+        insertClimb,
       }}
     >
       {children}
