@@ -206,11 +206,13 @@ export default function ClimbScreen({ route }: Props) {
               color={theme.colors.black}
             />
           )}
-          {climb.grade_name && (
+          {climb.grade_name ? (
             <Text style={styles.grade}>{climb.grade_name}</Text>
+          ) : (
+            <Text style={styles.projectText}>Project</Text>
           )}
-          {climb.total_quality_average && (
-            <StarRating rating={climb.total_quality_average} size={16} />
+          {climb.quality_average && (
+            <StarRating rating={climb.quality_average} size={16} />
           )}
         </View>
       </TouchableOpacity>
@@ -266,4 +268,8 @@ const useStyles = makeStyles(_theme => ({
     gap: 4,
   },
   grade: {},
+  projectText: {
+    fontStyle: 'italic',
+    opacity: 0.7,
+  },
 }));

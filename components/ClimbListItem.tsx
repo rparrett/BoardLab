@@ -35,13 +35,15 @@ export default function ClimbListItem({ item, onPress }: Props) {
         <View style={styles.leftColumn}>
           <Text style={[styles.title]}>{item.name}</Text>
           {subtitle && <Text style={[styles.subtitle]}>{subtitle}</Text>}
-          <Text style={[styles.subtitle]}>
-            {item.ascensionist_count} ascensionist
-            {item.ascensionist_count !== 1 ? 's' : ''}
-          </Text>
+          {item.grade_name && (
+            <Text style={[styles.subtitle]}>
+              {item.ascensionist_count} ascensionist
+              {item.ascensionist_count !== 1 ? 's' : ''}
+            </Text>
+          )}
         </View>
         <View style={styles.rightColumn}>
-          {item.grade_name && (
+          {item.grade_name ? (
             <Text
               style={[
                 styles.grade,
@@ -50,8 +52,12 @@ export default function ClimbListItem({ item, onPress }: Props) {
             >
               {item.grade_name}
             </Text>
+          ) : (
+            <Text style={styles.projectText}>Project</Text>
           )}
-          <StarRating rating={item.quality_average || 0.0} size={16} />
+          {item.quality_average && item.quality_average > 0 && (
+            <StarRating rating={item.quality_average} size={16} />
+          )}
         </View>
       </View>
     </TouchableHighlight>
@@ -92,5 +98,10 @@ const useStyles = makeStyles((theme, _props: Props) => ({
   },
   benchmarkGrade: {
     color: theme.colors.secondary,
+  },
+  projectText: {
+    fontStyle: 'italic',
+    opacity: 0.7,
+    fontSize: Platform.select({ ios: 15, default: 14 }),
   },
 }));
