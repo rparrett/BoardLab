@@ -11,6 +11,7 @@ interface AppState {
   setGrades: (grades: number[]) => void;
   setSetAtCurrentAngle: (setAtCurrentAngle: boolean) => void;
   setDiscoveryMode: (discoveryMode: boolean) => void;
+  setSetterUsername: (setterUsername: string) => void;
 
   // Climb creation state
   climbInProgress: Map<number, number>; // placement ID -> role ID
@@ -46,6 +47,7 @@ export const useAppState = create<AppState>()(
         grades: [],
         setAtCurrentAngle: false,
         discoveryMode: false,
+        setterUsername: '',
       },
       setClimbFilters: filters => set({ climbFilters: filters }),
       setAngle: angle =>
@@ -65,6 +67,10 @@ export const useAppState = create<AppState>()(
       setDiscoveryMode: discoveryMode =>
         set(state => ({
           climbFilters: { ...state.climbFilters, discoveryMode },
+        })),
+      setSetterUsername: setterUsername =>
+        set(state => ({
+          climbFilters: { ...state.climbFilters, setterUsername },
         })),
 
       // Climb creation state

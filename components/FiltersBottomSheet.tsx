@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, TouchableOpacity, Switch } from 'react-native';
-import { makeStyles, Text } from '@rn-vui/themed';
+import { View, TouchableOpacity, Switch, TextInput } from 'react-native';
+import { makeStyles, Text, useTheme } from '@rn-vui/themed';
 import { useAsync } from 'react-async-hook';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAppState } from '../stores/AppState';
@@ -19,8 +19,14 @@ export default function FiltersBottomSheet({
   onBackdropPress,
 }: FiltersBottomSheetProps) {
   const { getAvailableGrades, ready } = useDatabase();
-  const { climbFilters, setGrades, setSetAtCurrentAngle, setDiscoveryMode } =
-    useAppState();
+  const {
+    climbFilters,
+    setGrades,
+    setSetAtCurrentAngle,
+    setDiscoveryMode,
+    setSetterUsername,
+  } = useAppState();
+  const { theme } = useTheme();
   const styles = useStyles();
 
   const asyncGrades = useAsync(() => {
@@ -43,6 +49,10 @@ export default function FiltersBottomSheet({
     if (asyncGrades.result) {
       setGrades(asyncGrades.result.map(grade => grade.difficulty));
     }
+  };
+
+  const handleClearSetterUsername = () => {
+    setSetterUsername('');
   };
 
   return (
@@ -119,6 +129,24 @@ export default function FiltersBottomSheet({
           />
         </View>
       </View>
+
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Setter Username</Text>
+          {climbFilters.setterUsername?.trim() && (
+            <TouchableOpacity onPress={handleClearSetterUsername}>
+              <Text style={styles.actionButton}>Clear</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Filter by setter username"
+          placeholderTextColor={theme.colors.grey3}
+          value={climbFilters.setterUsername}
+          onChangeText={setSetterUsername}
+        />
+      </View>
     </SafeBottomSheet>
   );
 }
@@ -179,5 +207,15 @@ const useStyles = makeStyles(theme => ({
   switchLabel: {
     fontSize: 16,
     color: theme.colors.grey1,
+  },
+  textInput: {
+    backgroundColor: theme.colors.grey5,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: theme.colors.grey1,
+    borderWidth: 1,
+    borderColor: theme.colors.grey4,
   },
 }));
