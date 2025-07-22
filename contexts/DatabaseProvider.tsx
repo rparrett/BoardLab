@@ -512,7 +512,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         setterUsername,
         name,
         description,
-        3, // hsm - most common value - no idea what this means
+        3, // hsm - `3` might be "Bolt ons" + "Screw Ons". See `sets` database.
         4, // edge_left - TODO use current board value
         140, // edge_right - TODO use current board value
         4, // edge_bottom - TODO use current board value
