@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
-import { Icon } from '@rn-vui/themed';
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
 import { useDatabase } from '../contexts/DatabaseProvider';
 import { useAsync } from 'react-async-hook';
@@ -83,24 +82,30 @@ export default function BoardDisplay({
       return null;
     }
 
-    const iconSize = 22;
+    const indicatorSize = 24;
     let scaledX =
-      imageOffsetX + placement.x * containerDimensions.width - iconSize / 2 + 2;
-    let scaledY = imageOffsetY + placement.y * scaledImageHeight - iconSize / 2;
+      imageOffsetX +
+      placement.x * containerDimensions.width -
+      indicatorSize / 2;
+    let scaledY =
+      imageOffsetY + placement.y * scaledImageHeight - indicatorSize / 2;
 
     return (
       <View
         key={`placement-${placementId}`}
-        style={[styles.placementIndicator, { left: scaledX, top: scaledY }]}
+        style={[
+          styles.placementIndicator,
+          {
+            left: scaledX,
+            top: scaledY,
+            width: indicatorSize,
+            height: indicatorSize,
+            borderRadius: indicatorSize / 2,
+            borderColor: `#${role.screenColor}`,
+          },
+        ]}
         pointerEvents="none" // Prevent touch events from being intercepted by placement indicators
-      >
-        <Icon
-          name="circle-o"
-          type="font-awesome"
-          size={iconSize}
-          color={`#${role.screenColor}`}
-        />
-      </View>
+      />
     );
   };
 
@@ -343,5 +348,7 @@ const styles = StyleSheet.create({
   placementIndicator: {
     position: 'absolute',
     zIndex: 5,
+    borderWidth: 2.5,
+    backgroundColor: 'transparent',
   },
 });
