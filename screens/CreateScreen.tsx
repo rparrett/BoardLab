@@ -174,13 +174,11 @@ export default function CreateScreen({}: Props) {
       // Validate that we have placements
       if (climbInProgress.size === 0) {
         // TODO: Show error message
-        console.warn('Cannot save climb with no placements');
-        console.log(climbInProgress);
         return;
       }
 
       // Save climb to database
-      const uuid = await insertClimb({
+      await insertClimb({
         name: climbName || 'Untitled Climb',
         description: climbDescription || '',
         frames: climbInProgress,
@@ -188,18 +186,15 @@ export default function CreateScreen({}: Props) {
         setterUsername: 'LocalUser', // TODO: Get actual username
       });
 
-      console.log('Climb saved with UUID:', uuid);
-
       // Clear the creation state
       clearClimbInProgress();
       setClimbName('');
       setClimbDescription('');
 
-      // Navigate back to climbs tab
       navigation.navigate('Climbs');
     } catch (error) {
-      console.error('Failed to save climb:', error);
       // TODO: Show error message to user
+      console.error('Failed to save climb:', error);
     }
   };
 
