@@ -147,8 +147,9 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     const climbs: DbClimb[] = [];
 
     // Build the WHERE clause dynamically based on filters
+    // Include climbs from boards that are subsets of our 12x12 with kickboard (0,144,0,156)
     let whereClause =
-      'WHERE climbs.layout_id = 1 AND climbs.frames_count = 1 AND climbs.name LIKE ?';
+      'WHERE climbs.layout_id = 1 AND climbs.frames_count = 1 AND climbs.name LIKE ? AND climbs.edge_left >= 0 AND climbs.edge_right <= 144 AND climbs.edge_bottom >= 0 AND climbs.edge_top <= 156';
     let params: any[] = [filters.angle, `%${filters.search}%`];
 
     // Add grade filter if provided
@@ -513,10 +514,10 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         name,
         description,
         3, // hsm - `3` might be "Bolt ons" + "Screw Ons". See `sets` database.
-        4, // edge_left - TODO use current board value
-        140, // edge_right - TODO use current board value
-        4, // edge_bottom - TODO use current board value
-        152, // edge_top - TODO use current board value
+        0, // edge_left - 12x12 with kickboard dimensions
+        144, // edge_right - 12x12 with kickboard dimensions
+        0, // edge_bottom - 12x12 with kickboard dimensions
+        156, // edge_top - 12x12 with kickboard dimensions
         angle,
         1, // frames_count - not doing multi-frame routes yet
         0, // frames_pace - not doing multi-frame routes yet
