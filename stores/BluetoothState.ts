@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { BleManager, Device, State } from 'react-native-ble-plx';
+import Toast from 'react-native-toast-message';
 
 const ADVERTISING_SERVICE_UUID = '4488B571-7806-4DF6-BCFF-A2897E4953FF';
 const DATA_SERVICE_UUID = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E';
@@ -228,6 +229,11 @@ export const useBluetoothState = create<BluetoothState>((set, get) => {
         get();
 
       if (bluetoothState !== 'PoweredOn') {
+        Toast.show({
+          type: 'error',
+          text1: 'Bluetooth Disabled',
+          text2: 'Please enable Bluetooth to connect to devices',
+        });
         return;
       }
 

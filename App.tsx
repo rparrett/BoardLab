@@ -10,6 +10,8 @@ import { useColorScheme } from 'react-native';
 import { createTheme, ThemeProvider, useTheme } from '@rn-vui/themed';
 import { DatabaseProvider } from './contexts/DatabaseProvider';
 import { useBluetoothState } from './stores/BluetoothState';
+import ThemedToast from './components/ThemedToast';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Navigation = () => {
   let { theme } = useTheme();
@@ -46,11 +48,14 @@ export default function App() {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <DatabaseProvider>
-        <Navigation />
-      </DatabaseProvider>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider theme={theme}>
+        <DatabaseProvider>
+          <Navigation />
+          <ThemedToast />
+        </DatabaseProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
 
