@@ -18,7 +18,7 @@ export function useBleClimbSender() {
   }, [ready]);
 
   const asyncRoles = useAsync(() => {
-    return getRoles(1); // TODO: Get product ID from somewhere
+    return getRoles();
   }, [ready]);
 
   const sendToBoard = useCallback(

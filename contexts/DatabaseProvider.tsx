@@ -5,6 +5,11 @@ import { IndexedMap } from '../lib/IndexedMap';
 import { serializeFramesMap } from '../lib/frames-utils';
 import { v4 as uuidv4 } from 'uuid';
 
+// Values currently hardcoded for 12x12 Kilter Board w/ kickboard
+export const LAYOUT_ID = 1;
+export const PRODUCT_ID = 1;
+const PRODUCT_SIZE_ID = 10;
+
 export type DbClimb = {
   uuid: string;
   name: string;
@@ -86,7 +91,7 @@ type DatabaseContextType = {
     uuid: string,
   ) => Promise<Map<number, AngleStatsData>>;
   getPlacementData: () => Promise<Map<number, PlacementData>>;
-  getRoles: (productId: number) => Promise<Map<number, Role>>;
+  getRoles: () => Promise<Map<number, Role>>;
   getAvailableGrades: () => Promise<GradeOption[]>;
   insertClimb: (climbData: {
     name: string;
@@ -144,13 +149,33 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
 
     console.log('getFilteredClimbs');
 
+    // Get edge dimensions from product_sizes table
+    const { rows: productSizeRows } = await db.executeAsync(
+      'SELECT edge_left, edge_right, edge_bottom, edge_top FROM product_sizes WHERE id = ?',
+      [PRODUCT_SIZE_ID],
+    );
+
+    if (!productSizeRows || productSizeRows.length === 0) {
+      console.error('Could not find product size dimensions');
+      return new IndexedMap<string, DbClimb>([], climb => climb.uuid);
+    }
+
+    const productSize = productSizeRows.item(0);
     const climbs: DbClimb[] = [];
 
     // Build the WHERE clause dynamically based on filters
-    // Include climbs from boards that are subsets of our 12x12 with kickboard (0,144,0,156)
+    // Include climbs from boards that are subsets of our current board
     let whereClause =
-      'WHERE climbs.layout_id = 1 AND climbs.frames_count = 1 AND climbs.name LIKE ? AND climbs.edge_left >= 0 AND climbs.edge_right <= 144 AND climbs.edge_bottom >= 0 AND climbs.edge_top <= 156';
-    let params: any[] = [filters.angle, `%${filters.search}%`];
+      'WHERE climbs.layout_id = ? AND climbs.frames_count = 1 AND climbs.name LIKE ? AND climbs.edge_left >= ? AND climbs.edge_right <= ? AND climbs.edge_bottom >= ? AND climbs.edge_top <= ?';
+    let params: any[] = [
+      filters.angle,
+      LAYOUT_ID,
+      `%${filters.search}%`,
+      productSize.edge_left,
+      productSize.edge_right,
+      productSize.edge_bottom,
+      productSize.edge_top,
+    ];
 
     // Add grade filter if provided
     if (filters.grades && filters.grades.length > 0) {
@@ -267,11 +292,11 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         leds.position
       FROM placements
       JOIN holes ON placements.hole_id = holes.id
-      JOIN leds ON holes.id = leds.hole_id AND leds.product_size_id = 10
+      JOIN leds ON holes.id = leds.hole_id AND leds.product_size_id = ?
       JOIN product_sizes ON product_sizes.id = leds.product_size_id
-      WHERE placements.layout_id = 1
+      WHERE placements.layout_id = ?
       `,
-      [],
+      [PRODUCT_SIZE_ID, LAYOUT_ID],
     );
 
     const placementMap = new Map<number, PlacementData>();
@@ -293,7 +318,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     return placementMap;
   };
 
-  const getRoles = async (productId: number): Promise<Map<number, Role>> => {
+  const getRoles = async (): Promise<Map<number, Role>> => {
     if (!db) {
       console.warn('Attempting to query with no database connection.');
       return new Map();
@@ -312,7 +337,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       FROM placement_roles
       WHERE product_id = ?
       `,
-      [productId],
+      [PRODUCT_ID],
     );
 
     const rolesMap = new Map<number, Role>();
@@ -336,7 +361,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     const mockSpecialRoles: Role[] = [
       {
         id: 99,
-        productId: productId,
+        productId: PRODUCT_ID,
         position: 99,
         name: 'Matching',
         fullName: 'Matching Allowed',
@@ -345,7 +370,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       },
       {
         id: 98,
-        productId: productId,
+        productId: PRODUCT_ID,
         position: 98,
         name: 'Easy Mode',
         fullName: 'Easy Mode',
@@ -354,7 +379,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       },
       {
         id: 97,
-        productId: productId,
+        productId: PRODUCT_ID,
         position: 97,
         name: 'Purple',
         fullName: 'Purple',
@@ -363,7 +388,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       },
       {
         id: 96,
-        productId: productId,
+        productId: PRODUCT_ID,
         position: 96,
         name: 'Blue',
         fullName: 'Blue',
@@ -453,7 +478,6 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     return grades;
   };
 
-  // Generate a UUID without hyphens (to match database format)
   const generateUuid = (): string => {
     return uuidv4().replace(/-/g, '');
   };
@@ -484,6 +508,18 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     // Auto-detect if this is a "no match" climb based on description
     const isNoMatch = /no match/i.test(description);
 
+    // Get edge dimensions from product_sizes table
+    const { rows: productSizeRows } = await db.executeAsync(
+      'SELECT edge_left, edge_right, edge_bottom, edge_top FROM product_sizes WHERE id = ?',
+      [PRODUCT_SIZE_ID],
+    );
+
+    if (!productSizeRows || productSizeRows.length === 0) {
+      throw new Error('Could not find product size dimensions');
+    }
+
+    const productSize = productSizeRows.item(0);
+
     await db.executeAsync(
       `INSERT INTO climbs (
         uuid,
@@ -508,16 +544,16 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         uuid,
-        1, // layout_id
+        LAYOUT_ID,
         1, // setter_id - default to 1 for now
         setterUsername,
         name,
         description,
         3, // hsm - `3` might be "Bolt ons" + "Screw Ons". See `sets` database.
-        0, // edge_left - 12x12 with kickboard dimensions
-        144, // edge_right - 12x12 with kickboard dimensions
-        0, // edge_bottom - 12x12 with kickboard dimensions
-        156, // edge_top - 12x12 with kickboard dimensions
+        productSize.edge_left,
+        productSize.edge_right,
+        productSize.edge_bottom,
+        productSize.edge_top,
         angle,
         1, // frames_count - not doing multi-frame routes yet
         0, // frames_pace - not doing multi-frame routes yet
@@ -525,7 +561,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         true, // is_draft - keep user-created climbs as drafts
         false, // is_listed - start as private
         now,
-        isNoMatch, // is_nomatch - auto-detected from description
+        isNoMatch,
       ],
     );
 

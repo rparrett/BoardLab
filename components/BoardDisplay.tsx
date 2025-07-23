@@ -53,7 +53,7 @@ export default function BoardDisplay({
   }, [ready]);
 
   const asyncRoles = useAsync(() => {
-    return getRoles(1);
+    return getRoles();
   }, [ready]);
 
   const placementData = asyncPlacementData.result;

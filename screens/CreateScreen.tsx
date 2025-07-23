@@ -62,7 +62,7 @@ export default function CreateScreen({}: Props) {
   const [isAngleSelectVisible, setIsAngleSelectVisible] = useState(false);
 
   const asyncRoles = useAsync(() => {
-    return getRoles(1);
+    return getRoles();
   }, [ready]);
 
   const { sendToBoard } = useBleClimbSender();
