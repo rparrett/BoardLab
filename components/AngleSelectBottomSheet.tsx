@@ -46,13 +46,17 @@ export default function AngleSelectBottomSheet({
   const angleOptions = generateAngleOptions(0, 70, 5);
 
   return (
-    <SafeBottomSheet isVisible={isVisible} onBackdropPress={onBackdropPress}>
-      <BottomSheetHeader
-        key="title"
-        title="Select Angle"
-        onClose={onBackdropPress}
-      />
-
+    <SafeBottomSheet
+      isVisible={isVisible}
+      onBackdropPress={onBackdropPress}
+      header={
+        <BottomSheetHeader
+          key="title"
+          title="Select Angle"
+          onClose={onBackdropPress}
+        />
+      }
+    >
       {angleOptions.map(option => {
         const stats = angleStats?.get(option.value);
         const isSetterAngle = setterAngle === option.value;

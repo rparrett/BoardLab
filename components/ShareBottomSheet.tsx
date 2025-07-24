@@ -50,9 +50,13 @@ export default function ShareBottomSheet({
   };
 
   return (
-    <SafeBottomSheet isVisible={isVisible} onBackdropPress={onBackdropPress}>
-      <BottomSheetHeader title="Share Climb" onClose={onBackdropPress} />
-
+    <SafeBottomSheet
+      isVisible={isVisible}
+      onBackdropPress={onBackdropPress}
+      header={
+        <BottomSheetHeader title="Share Climb" onClose={onBackdropPress} />
+      }
+    >
       <ListItem
         onPress={handleShare}
         bottomDivider

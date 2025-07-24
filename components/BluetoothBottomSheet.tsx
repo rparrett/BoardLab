@@ -45,12 +45,13 @@ export default function BluetoothBottomSheet() {
     <SafeBottomSheet
       isVisible={showDeviceScanner}
       onBackdropPress={handleBackdropPress}
+      header={
+        <BottomSheetHeader
+          title="Bluetooth Devices"
+          onClose={handleBackdropPress}
+        />
+      }
     >
-      <BottomSheetHeader
-        title="Bluetooth Devices"
-        onClose={handleBackdropPress}
-      />
-
       {isScanning && (
         <ListItem containerStyle={styles.scanningItem}>
           <ActivityIndicator size="small" />

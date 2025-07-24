@@ -29,9 +29,13 @@ export default function ClimbInfoBottomSheet({
   };
 
   return (
-    <SafeBottomSheet isVisible={isVisible} onBackdropPress={onBackdropPress}>
-      <BottomSheetHeader title="Climb Info" onClose={onBackdropPress} />
-
+    <SafeBottomSheet
+      isVisible={isVisible}
+      onBackdropPress={onBackdropPress}
+      header={
+        <BottomSheetHeader title="Climb Info" onClose={onBackdropPress} />
+      }
+    >
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Description</Text>
         <Text style={styles.text}>

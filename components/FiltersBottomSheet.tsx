@@ -56,9 +56,11 @@ export default function FiltersBottomSheet({
   };
 
   return (
-    <SafeBottomSheet isVisible={isVisible} onBackdropPress={onBackdropPress}>
-      <BottomSheetHeader title="Filters" onClose={onBackdropPress} />
-
+    <SafeBottomSheet
+      isVisible={isVisible}
+      onBackdropPress={onBackdropPress}
+      header={<BottomSheetHeader title="Filters" onClose={onBackdropPress} />}
+    >
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Grades</Text>

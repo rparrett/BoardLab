@@ -63,9 +63,11 @@ export default function ClimbEditBottomSheet({
   };
 
   return (
-    <SafeBottomSheet isVisible={isVisible} onBackdropPress={handleCancel}>
-      <BottomSheetHeader title="Edit Climb" onClose={handleCancel} />
-
+    <SafeBottomSheet
+      isVisible={isVisible}
+      onBackdropPress={handleCancel}
+      header={<BottomSheetHeader title="Edit Climb" onClose={handleCancel} />}
+    >
       <View style={styles.section}>
         <Text style={styles.label}>Name</Text>
         <TextInput
