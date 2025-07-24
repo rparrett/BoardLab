@@ -46,6 +46,8 @@ export default function ClimbScreen({ route }: Props) {
     setClimbInProgress,
     setAngle,
     setLastViewedClimb,
+    setClimbName,
+    setClimbDescription,
   } = useAppState();
   const styles = useStyles();
   const { theme } = useTheme();
@@ -107,6 +109,10 @@ export default function ClimbScreen({ route }: Props) {
   const handleSendToCreate = () => {
     const copyAndNavigate = () => {
       setClimbInProgress(climbPlacements);
+      if (displayedClimb) {
+        setClimbName(displayedClimb.name || '');
+        setClimbDescription(displayedClimb.description || '');
+      }
       navigation.navigate('Create' as any);
     };
 
