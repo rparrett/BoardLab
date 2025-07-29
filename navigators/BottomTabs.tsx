@@ -4,6 +4,7 @@ import ClimbsStack from './ClimbsStack';
 import { StaticParamList } from '@react-navigation/native';
 import { Icon } from '@rn-vui/themed';
 import CreateScreen from '../screens/CreateScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 export type BottomTabsParamList = StaticParamList<typeof BottomTabs>;
 
@@ -28,6 +29,14 @@ const BottomTabs = createBottomTabNavigator({
       options: {
         tabBarIcon: ({ color, size }) => (
           <Icon name="create" type="material" color={color} size={size} />
+        ),
+      },
+    },
+    Profile: {
+      screen: ProfileScreen,
+      options: {
+        tabBarIcon: ({ color, size }) => (
+          <Icon name="person" type="material" color={color} size={size} />
         ),
       },
     },
